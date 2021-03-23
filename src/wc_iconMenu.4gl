@@ -56,7 +56,7 @@ FUNCTION (this wc_iconMenu) init(l_fileName STRING, l_useWC BOOLEAN) RETURNS BOO
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION (this wc_iconMenu) itemActive(l_item STRING, l_active BOOLEAN) RETURNS BOOLEAN
-	DEFINE x     SMALLINT
+	DEFINE x SMALLINT
 	FOR x = 1 TO this.menuJS.menu.getLength()
 		IF l_item = this.menuJS.menu[x].action THEN
 			DEBUG(4, SFMT("itemActive: %1 was: %2 now: %3 ", l_item, this.menuJS.menu[x].active, l_active))
@@ -69,7 +69,7 @@ FUNCTION (this wc_iconMenu) itemActive(l_item STRING, l_active BOOLEAN) RETURNS 
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION (this wc_iconMenu) itemText(l_item STRING, l_text STRING) RETURNS BOOLEAN
-	DEFINE x     SMALLINT
+	DEFINE x SMALLINT
 	FOR x = 1 TO this.menuJS.menu.getLength()
 		IF l_item = this.menuJS.menu[x].action THEN
 			DEBUG(4, SFMT("itemText: %1 was: %2 now: %3 ", l_item, this.menuJS.menu[x].text, l_text))
@@ -81,7 +81,7 @@ FUNCTION (this wc_iconMenu) itemText(l_item STRING, l_text STRING) RETURNS BOOLE
 	RETURN FALSE
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION (this   wc_iconMenu) ui(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRING
+FUNCTION (this wc_iconMenu) ui(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRING
 	DEFINE d       ui.Dialog
 	DEFINE x       SMALLINT
 	DEFINE l_event STRING
@@ -102,7 +102,7 @@ FUNCTION (this   wc_iconMenu) ui(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRI
 		CALL d.addTrigger("ON TIMER "||l_timer)
 	END IF }
 	IF l_idle > 0 THEN -- Waiting on FGL-5133
-		CALL d.addTrigger("ON IDLE "||l_idle)
+		CALL d.addTrigger("ON IDLE " || l_idle)
 	END IF
 	FOR x = 1 TO this.menuJS.menu.getLength()
 		DEBUG(4, "Adding action: " || this.menuJS.menu[x].action)
@@ -111,7 +111,7 @@ FUNCTION (this   wc_iconMenu) ui(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRI
 		END IF
 	END FOR
 --	CALL d.addTrigger("ON ACTION exit")
-	DEBUG(1, SFMT("wc_iconMenu.ui: Menu, timeout is: %1", l_idle ))
+	DEBUG(1, SFMT("wc_iconMenu.ui: Menu, timeout is: %1", l_idle))
 	WHILE TRUE
 		LET l_event = d.nextEvent()
 		IF l_event.subString(1, 10) = "ON ACTION " THEN
@@ -141,27 +141,27 @@ FUNCTION (this   wc_iconMenu) ui(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRI
 	RETURN l_event
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION (this   wc_iconMenu) menu(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRING
+FUNCTION (this wc_iconMenu) menu(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRING
 	DEFINE l_event STRING
 	DEFINE x, y, i SMALLINT
-	DEFINE n om.DomNode
+	DEFINE n       om.DomNode
 	LET n = ui.Window.getCurrent().getForm().getNode()
 	LET y = n.selectByPath("//Button[@tag=\"menu\"]").getLength()
-	DEBUG(1, SFMT("wc_iconMenu.menu: Menu, timeout is: %1", l_idle ))
+	DEBUG(1, SFMT("wc_iconMenu.menu: Menu, timeout is: %1", l_idle))
 	MENU
 		BEFORE MENU
 			LET i = this.menuJS.menu.getLength()
 			FOR x = 1 TO y
 				IF x > i OR this.menuJS.menu[x].text.getLength() = 0 OR this.menuJS.menu[x].text.getCharAt(1) = "_" THEN
-					LET this.menuJS.menu[x].action = "opt"||x
-					CALL DIALOG.getForm().setElementHidden("opt"||x, TRUE)
+					LET this.menuJS.menu[x].action = "opt" || x
+					CALL DIALOG.getForm().setElementHidden("opt" || x, TRUE)
 				ELSE
-					CALL DIALOG.getForm().setElementText("opt"||x, this.menuJS.menu[x].text )
-					CALL DIALOG.getForm().setElementImage("opt"||x, this.menuJS.menu[x].image )
+					CALL DIALOG.getForm().setElementText("opt" || x, this.menuJS.menu[x].text)
+					CALL DIALOG.getForm().setElementImage("opt" || x, this.menuJS.menu[x].image)
 					IF NOT this.menuJS.menu[x].active THEN
-						CALL DIALOG.setActionActive("opt"||x, FALSE)
+						CALL DIALOG.setActionActive("opt" || x, FALSE)
 					ELSE
-						CALL DIALOG.setActionActive("opt"||x, TRUE)
+						CALL DIALOG.setActionActive("opt" || x, TRUE)
 					END IF
 				END IF
 			END FOR
@@ -206,7 +206,7 @@ FUNCTION (this   wc_iconMenu) menu(l_timer SMALLINT, l_idle SMALLINT) RETURNS ST
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Get file/path for the menu
-FUNCTION (this    wc_iconMenu) getJSfromFile(l_fileName STRING) RETURNS STRING
+FUNCTION (this wc_iconMenu) getJSfromFile(l_fileName STRING) RETURNS STRING
 	DEFINE l_menu   TEXT
 	DEFINE l_jsFile STRING
 	LET l_jsFile = os.path.join(os.path.join("..", "etc"), l_fileName)
@@ -225,7 +225,7 @@ FUNCTION (this    wc_iconMenu) getJSfromFile(l_fileName STRING) RETURNS STRING
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION (this wc_iconMenu) addMenuItem(l_text STRING, l_img STRING, l_act STRING, l_live BOOLEAN)
-	DEFINE x     SMALLINT
+	DEFINE x SMALLINT
 	LET x                          = this.menuJS.menu.getLength() + 1
 	LET this.menuJS.menu[x].text   = l_text
 	LET this.menuJS.menu[x].image  = l_img

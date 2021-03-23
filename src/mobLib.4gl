@@ -24,7 +24,7 @@ PUBLIC TYPE mobLibCFG RECORD
 	imgPath      STRING,
 	docPath      STRING,
 	logPath      STRING,
-	baseDir       STRING,
+	baseDir      STRING,
 	iconMenu     BOOLEAN,
 	refreshAge   DATETIME HOUR TO MINUTE,
 	jobAge       SMALLINT,
@@ -42,13 +42,13 @@ PUBLIC TYPE mobLibCFG RECORD
 END RECORD
 
 TYPE t_mobInfo RECORD
-		connected STRING,
-		ip STRING,
-		model STRING,
-		os STRING,
-		osver STRING,
-		datadir STRING
-	END RECORD
+	connected STRING,
+	ip        STRING,
+	model     STRING,
+	os        STRING,
+	osver     STRING,
+	datadir   STRING
+END RECORD
 
 PUBLIC TYPE mobLib RECORD
 	reg RECORD
@@ -77,7 +77,7 @@ PUBLIC TYPE mobLib RECORD
 	cloudStore    BOOLEAN,
 	viewFiles     BOOLEAN,
 	cfg           mobLibCFG,
-	lastError STRING,
+	lastError     STRING,
 	buttons DYNAMIC ARRAY OF RECORD
 		name    STRING,
 		text    STRING,
@@ -86,7 +86,7 @@ PUBLIC TYPE mobLib RECORD
 	END RECORD
 END RECORD
 
-FUNCTION (this mobLib) init(l_app STRING) RETURNS( mobLib )
+FUNCTION (this mobLib) init(l_app STRING) RETURNS(mobLib)
 	DEFINE x SMALLINT
 	WHENEVER ERROR CALL app_error
 	LET this.cfg.debug = fgl_getEnv("MDDEBUG")
@@ -98,7 +98,9 @@ FUNCTION (this mobLib) init(l_app STRING) RETURNS( mobLib )
 		LET this.dbName = C_DEF_DB
 	END IF
 	LET this.ros_ver = ARG_VAL(3)
-	IF this.ros_ver IS NULL THEN LET this.ros_ver = 0 END IF
+	IF this.ros_ver IS NULL THEN
+		LET this.ros_ver = 0
+	END IF
 
 	IF this.dbName.getCharAt(1) = "d" THEN
 		LET this.reg.cono = this.dbName.subString(2, 5)
@@ -116,7 +118,7 @@ FUNCTION (this mobLib) init(l_app STRING) RETURNS( mobLib )
 	LET this.cfg.imgPath          = fgl_getEnv("MDIMGPATH")
 	LET this.cfg.docPath          = fgl_getEnv("MDDOCPATH")
 	LET this.cfg.logPath          = fgl_getEnv("MDLOGPATH")
-	LET this.cfg.baseDir           = fgl_getEnv("BASEDIR")
+	LET this.cfg.baseDir          = fgl_getEnv("BASEDIR")
 	LET this.cfg.iconMenu         = fgl_getEnv("ICONMENU")
 	LET this.cfg.style            = fgl_getEnv("STYLE")
 	LET this.cfg.gma_settings     = fgl_getEnv("GMASETTINGS")
@@ -264,8 +266,13 @@ FUNCTION (this mobLib) about()
 	IF this.feMobile THEN
 		CALL this.get_mobInfo()
 		LET l_txt = l_txt.append(SFMT("\nMob Connected: %1", this.mobdev_info.connected))
-		LET l_txt = l_txt.append(SFMT("\nMob Info: %1 %2 %3\nDataDir: %4", this.mobdev_info.model, this.mobdev_info.os, this.mobdev_info.osver, this.mobdev_info.datadir))
-		IF this.cli_ip IS NULL THEN LET this.cli_ip = this.mobdev_info.ip END IF
+		LET l_txt =
+				l_txt.append(
+						SFMT("\nMob Info: %1 %2 %3\nDataDir: %4",
+								this.mobdev_info.model, this.mobdev_info.os, this.mobdev_info.osver, this.mobdev_info.datadir))
+		IF this.cli_ip IS NULL THEN
+			LET this.cli_ip = this.mobdev_info.ip
+		END IF
 	END IF
 	LET l_txt = l_txt.append(SFMT("\nClient IP: %1", this.cli_ip))
 	LET l_txt = l_txt.append(SFMT("\nDev IP: %1", this.reg.dev_ip))
@@ -305,7 +312,7 @@ FUNCTION (this mobLib) about()
 
 	DISPLAY l_txt TO txt
 	DEBUG(1, SFMT("about: Menu, timeout is %1", this.cfg.timeouts.short))
-	DEBUG(0, util.json.stringify( this ) )
+	DEBUG(0, util.json.stringify(this))
 	MENU
 		BEFORE MENU
 			IF this.feName != "GMA" THEN
@@ -346,7 +353,9 @@ END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION (this mobLib) get_mobInfo()
 	CALL ui.Interface.frontCall("mobile", "connectivity", [], [this.mobdev_info.connected])
-	IF this.mobdev_info.model IS NOT NULL THEN RETURN END IF
+	IF this.mobdev_info.model IS NOT NULL THEN
+		RETURN
+	END IF
 	TRY
 		CALL ui.Interface.frontCall("standard", "feinfo", "ip", [this.mobdev_info.ip])
 	CATCH

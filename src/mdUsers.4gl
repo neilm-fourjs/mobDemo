@@ -52,7 +52,7 @@ FUNCTION (this mdUsers) login(l_titl STRING, l_info STRING) RETURNS BOOLEAN
 	DISPLAY FORM login
 	DISPLAY l_titl TO titl
 	IF l_info IS NOT NULL THEN
-		CALL ui.Window.getCurrent().getForm().setFieldHidden("formonly.info",FALSE)
+		CALL ui.Window.getCurrent().getForm().setFieldHidden("formonly.info", FALSE)
 		DISPLAY l_info TO info
 	END IF
 	LET int_flag = FALSE
@@ -266,8 +266,7 @@ END FUNCTION
 FUNCTION (this mdUsers) emp_enq()
 	DEFINE l_current, l_allocated SMALLINT
 
-	CALL dbLib.claimedTime(this.emp_rec.short_code)
-			RETURNING this.claim_mtd, this.claim_wtd, this.claim_today
+	CALL dbLib.claimedTime(this.emp_rec.short_code) RETURNING this.claim_mtd, this.claim_wtd, this.claim_today
 
 	CALL dbLib.activeTasks(this.emp_rec.short_code, this.branch) RETURNING l_current, l_allocated
 	OPEN WINDOW emp_enq WITH FORM this.mobLib.openForm("trimEmpEnq")

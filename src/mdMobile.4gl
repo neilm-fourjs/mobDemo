@@ -36,7 +36,7 @@ DEFINE m_tasks  mdTasks
 MAIN
 	DEFINE l_titl     STRING
 	DEFINE l_menuForm STRING
-	DEFINE l_info STRING
+	DEFINE l_info     STRING
 
 	OPTIONS ON TERMINATE SIGNAL CALL app_terminate, ON CLOSE APPLICATION CALL app_close
 	WHENEVER ERROR CALL app_error
@@ -59,8 +59,10 @@ MAIN
 	OPEN FORM menu FROM l_menuForm
 
 	IF fgl_getEnv("SHOWINFO") = 1 THEN
-		LET l_info = SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",'<i class="material-icons">clean_hands</i>','<i class="material-icons">coronavirus</i>')
-		DISPLAY "Info: ",l_info
+		LET l_info =
+				SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",
+						'<i class="material-icons">clean_hands</i>', '<i class="material-icons">coronavirus</i>')
+		DISPLAY "Info: ", l_info
 	END IF
 	WHILE TRUE
 		LET m_mobLib.emp_code = NULL
@@ -69,13 +71,12 @@ MAIN
 		IF NOT m_user.login(l_titl, l_info) THEN
 			CALL m_mobLib.exitProgram("Login Failed", 1)
 		END IF
-		LET m_mobLib.user_id   = m_user.emp_rec.user_id
-		LET m_mobLib.emp_code  = m_user.emp_rec.short_code
-		LET m_mobLib.branch    = m_user.branch
+		LET m_mobLib.user_id  = m_user.emp_rec.user_id
+		LET m_mobLib.emp_code = m_user.emp_rec.short_code
+		LET m_mobLib.branch   = m_user.branch
 		CALL dbLib.init(m_mobLib)
 
-			LET m_mobLib.cloudStore = FALSE
-
+		LET m_mobLib.cloudStore = FALSE
 
 		DISPLAY FORM menu
 		IF NOT m_menu.init("mdMenu.json", m_mobLib.cfg.iconMenu) THEN
@@ -136,7 +137,7 @@ FUNCTION mainMenu() RETURNS()
 			WHEN "search"
 				CALL m_tasks.search() -- Search for jobs
 			WHEN "empenq"
-				CALL m_user.emp_enq() -- Employ Enquiry
+				CALL m_user.emp_enq()     -- Employ Enquiry
 				CALL m_tasks.list.clear() -- clear the tasks list to force a refresh of data so emp_enq number agree
 			WHEN "about"
 				DISPLAY "MU:", m_user.mobLib.user_id, " M:", m_mobLib.user_id, " MT:", m_tasks.mobLib.user_id

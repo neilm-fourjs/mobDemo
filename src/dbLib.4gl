@@ -128,7 +128,7 @@ FUNCTION validUser(l_user STRING, l_pwd STRING) RETURNS(BOOLEAN, STRING)
 		RETURN FALSE, NULL
 	END IF
 -- Hack for testing only - only works if user 'test' actually exists in the data - which it shouldn't
-	IF l_user.subString(1,4) = "test" AND l_pwd = "test" AND m_db_moblib.cfg.allowTest THEN
+	IF l_user.subString(1, 4) = "test" AND l_pwd = "test" AND m_db_moblib.cfg.allowTest THEN
 		RETURN TRUE, l_users.user_name
 	END IF
 -- Actually check the users password.
@@ -265,7 +265,8 @@ FUNCTION logDeviceLogin(
 		END IF
 		LET l_last_login = CURRENT
 		UPDATE device_login SET (last_dev_id, last_dev_id2, last_dev_ip, last_ip, last_login, failed_attempts, logged_in)
-				= (m_db_moblib.reg.dev_id, m_db_moblib.reg.dev_id2, m_db_mobLib.reg.dev_ip, m_db_moblib.cli_ip, l_last_login, 0, "Y")
+				= (m_db_moblib.reg.dev_id, m_db_moblib.reg.dev_id2, m_db_mobLib.reg.dev_ip, m_db_moblib.cli_ip, l_last_login, 0,
+						"Y")
 				WHERE emp_user = l_empCode AND branch_code = l_branch AND app_name = m_db_mobLib.appName
 	ELSE
 		LET l_last_login = CURRENT
@@ -373,8 +374,7 @@ FUNCTION activeTasks(l_empCode LIKE emp01.short_code, l_branch LIKE emp01.branch
 		END IF
 	END FOREACH
 
-	SELECT COUNT(*) INTO l_count3 FROM next_job
-			WHERE employee = l_empCode AND taken IS NULL
+	SELECT COUNT(*) INTO l_count3 FROM next_job WHERE employee = l_empCode AND taken IS NULL
 
 	DEBUG(3, SFMT("activeTasks: count1: %1 (trim1) count2: %2 (trim2) count3: %3 (next_job)", l_count1, l_count2, l_count3))
 	RETURN l_count1 + l_count2, l_count3
@@ -420,8 +420,8 @@ FUNCTION clockOff(l_emp RECORD LIKE emp01.*) RETURNS BOOLEAN
 	DEFINE l_rowId      INTEGER
 
 &ifdef NOUPD
- DEBUG(0,"clockOff: NOUPD defined - not updating database!")
- RETURN TRUE
+	DEBUG(0, "clockOff: NOUPD defined - not updating database!")
+	RETURN TRUE
 &endif
 
 	LET l_clock_time = CURRENT
@@ -513,8 +513,8 @@ FUNCTION startTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CH
 	DEFINE l_lista_trim  RECORD LIKE lista_trim.*
 
 &ifdef NOUPD
- DEBUG(0,"startTask: NOUPD defined - not updating database!")
- RETURN TRUE
+	DEBUG(0, "startTask: NOUPD defined - not updating database!")
+	RETURN TRUE
 &endif
 
 	DEBUG(2, SFMT("startTask: %1:%2:%3:%4", l_emp.branch_code, l_emp.short_code, l_job_link, l_work_code))
@@ -616,8 +616,8 @@ FUNCTION stopTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CHA
 	DEFINE l_clock_time LIKE trim1.swipe_time
 	DEFINE l_trim2_key  INTEGER
 &ifdef NOUPD
- DEBUG(0,"stopTask: NOUPD defined - not updating database!")
- RETURN TRUE
+	DEBUG(0, "stopTask: NOUPD defined - not updating database!")
+	RETURN TRUE
 &endif
 
 	LET l_clock_time = CURRENT
@@ -675,9 +675,9 @@ FUNCTION completeTask(
 	DEFINE l_ret        INT
 	DEFINE l_command    CHAR(1)
 &ifdef NOUPD
- DEBUG(0,"completeTask: NOUPD defined - not updating database!")
-  CALL dbLib_error( "NOUPD defined - not updating database!" )
- RETURN FALSE
+	DEBUG(0, "completeTask: NOUPD defined - not updating database!")
+	CALL dbLib_error("NOUPD defined - not updating database!")
+	RETURN FALSE
 &endif
 
 	LET l_clock_time = CURRENT
@@ -1015,9 +1015,9 @@ FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS DYNAM
 			SELECT * FROM lista, lists
 					WHERE lista.job_link = l_job01.job_link AND lista.entry_no = 0 AND lists.internal_no = lista.list_link
 							AND lists.show_trim = "Y" AND lists.work_code IS NOT NULL AND p_status < 128 -- exclude completed tasks
--- Apperently collection and delivery should be included now.
---							AND lista.list_link != l_collection
---							AND lista.list_link != l_delivery 
+					-- Apperently collection and delivery should be included now.
+					--							AND lista.list_link != l_collection
+					--							AND lista.list_link != l_delivery
 					ORDER BY lists.list_no ASC
 	LET x    = 1
 	LET l_st = CURRENT
@@ -1162,8 +1162,8 @@ FUNCTION putFileForJob(l_job_link LIKE job01.job_link, l_path STRING, l_file STR
 	DEFINE l_stat    SMALLINT
 	DEFINE l_source  STRING
 
-		CALL dbLib_error("Cloud Store not enabled.")
-		RETURN FALSE
+	CALL dbLib_error("Cloud Store not enabled.")
+	RETURN FALSE
 
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1173,8 +1173,8 @@ FUNCTION getFileForJob(l_job_link LIKE job01.job_link, l_path STRING, l_file STR
 	DEFINE l_stat    SMALLINT
 	DEFINE l_target  STRING
 
-		CALL dbLib_error("Cloud Store not enabled.")
-		RETURN FALSE
+	CALL dbLib_error("Cloud Store not enabled.")
+	RETURN FALSE
 
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1259,7 +1259,7 @@ FUNCTION getDocsForJob(l_job_link LIKE job01.job_link, l_dir1 STRING, l_dir2 STR
 		END WHILE
 	END IF
 
-		RETURN l_arr
+	RETURN l_arr
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Get a list of Parts/sublet for a job.
@@ -1347,7 +1347,7 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 		CASE l_list_title
 			WHEN "NEW PARTS"
 				IF l_parts.stock_no IS NOT NULL THEN
-					LET l_arr[x].line1    = l_arr[x].line1.append(SFMT(" ( %1 )", l_parts.stock_no CLIPPED))
+					LET l_arr[x].line1 = l_arr[x].line1.append(SFMT(" ( %1 )", l_parts.stock_no CLIPPED))
 				END IF
 				LET l_arr[x].line_img = "parts"
 				IF l_parts.no_delivered > 0 AND l_parts.p_status = "D" THEN
@@ -1434,8 +1434,8 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 			LET l_running = TRUE
 		END IF
 		IF l_running THEN
-			LET l_started     = TRUE
-	--		LET l_worked_time = conv_time_to_dec_(l_interval)
+			LET l_started = TRUE
+			--		LET l_worked_time = conv_time_to_dec_(l_interval)
 		ELSE
 			IF l_lista_rec.actual_hours IS NOT NULL AND l_lista_rec.actual_hours > 0 THEN
 				LET l_started = TRUE

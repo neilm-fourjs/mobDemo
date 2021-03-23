@@ -32,7 +32,7 @@ TYPE t_task RECORD -- Details for a task.
 	line1   STRING,
 	line2   STRING,
 	state   SMALLINT, -- 0=stopped / 1=started / 2=ended / 3=complete
-	trim    SMALLINT,  -- 1 trim1 / 2 trim2 / 3 next_job
+	trim    SMALLINT, -- 1 trim1 / 2 trim2 / 3 next_job
 	allowed BOOLEAN
 END RECORD
 
@@ -59,7 +59,7 @@ PUBLIC TYPE mdTasks RECORD -- The Task Object Structure
 	taskRec     dbLib.t_listData1,
 	task_count  SMALLINT,
 	mobLib      mobLib,
-	mdUser    mdUsers
+	mdUser      mdUsers
 END RECORD
 
 DEFINE m_TasksArr DYNAMIC ARRAY OF dbLib.t_listData1
@@ -70,7 +70,7 @@ END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Set the structure.
 FUNCTION (this mdTasks) init(l_user mdUsers INOUT, l_mobLib mobLib INOUT)
-	LET this.mdUser    = l_user
+	LET this.mdUser      = l_user
 	LET this.mobLib      = l_mobLib
 	LET this.branch      = this.mdUser.emp_rec.branch_code
 	LET this.delivery    = -1
@@ -97,7 +97,7 @@ FUNCTION (this mdTasks) getTasks(l_forUser BOOLEAN) RETURNS()
 		LET l_age = CURRENT - this.gotUser
 		LET l_chk = this.getEmpAge
 	END IF
-	DEBUG(1, SFMT("getTasks: forUSer: %1 Age: %2  Check: %3 ", IIF(l_forUser,"True","False"), NVL(l_age, "NULL"), l_chk))
+	DEBUG(1, SFMT("getTasks: forUSer: %1 Age: %2  Check: %3 ", IIF(l_forUser, "True", "False"), NVL(l_age, "NULL"), l_chk))
 -- only get new tasks if the current task list is older that the required age or we don't have a task list.
 	IF l_age IS NULL OR l_age > l_chk OR this.list.getLength() = 0 THEN
 		CALL this.loadArray(l_forUser)
@@ -250,10 +250,10 @@ END FUNCTION
 --
 -- @param l_id ID of the task
 FUNCTION (this mdTasks) start(l_id STRING) RETURNS BOOLEAN
-	DEFINE l_msg    STRING
-	DEFINE l_held   BOOLEAN
-	DEFINE l_reason STRING
-	DEFINE l_current SMALLINT
+	DEFINE l_msg       STRING
+	DEFINE l_held      BOOLEAN
+	DEFINE l_reason    STRING
+	DEFINE l_current   SMALLINT
 	DEFINE l_allocated SMALLINT
 	DEBUG(2, SFMT("start: ID: %1 ", l_id))
 	IF NOT this.setCurrentRec(l_id) THEN
@@ -279,8 +279,7 @@ FUNCTION (this mdTasks) start(l_id STRING) RETURNS BOOLEAN
 		RETURN FALSE
 	END IF
 
-	CALL dbLib.checkTaskHeld(this.taskRec.job_link, this.taskRec.work_code, FALSE)
-			RETURNING l_held, l_reason
+	CALL dbLib.checkTaskHeld(this.taskRec.job_link, this.taskRec.work_code, FALSE) RETURNING l_held, l_reason
 	IF l_reason IS NOT NULL THEN
 		CALL stdLib.popup("Task On Hold", l_reason, "information", this.mobLib.cfg.timeouts.long)
 		IF l_held THEN
@@ -291,7 +290,8 @@ FUNCTION (this mdTasks) start(l_id STRING) RETURNS BOOLEAN
 	END IF
 
 	LET m_TasksArr[l_id].started = CURRENT
-	IF dbLib.startTask(this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].started) THEN
+	IF dbLib.startTask(
+			this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].started) THEN
 		MESSAGE "Task Started"
 	ELSE
 		ERROR "Task Failed to Start!"
@@ -305,7 +305,7 @@ END FUNCTION
 --
 -- @param l_id ID of the task
 FUNCTION (this mdTasks) complete(l_id STRING) RETURNS BOOLEAN
-	DEFINE l_msg STRING
+	DEFINE l_msg    STRING
 	DEFINE l_held   BOOLEAN
 	DEFINE l_reason STRING
 
@@ -319,8 +319,7 @@ FUNCTION (this mdTasks) complete(l_id STRING) RETURNS BOOLEAN
 		RETURN FALSE
 	END IF
 
-	CALL dbLib.checkTaskHeld(this.taskRec.job_link, this.taskRec.work_code, TRUE)
-			RETURNING l_held, l_reason
+	CALL dbLib.checkTaskHeld(this.taskRec.job_link, this.taskRec.work_code, TRUE) RETURNING l_held, l_reason
 	IF l_reason IS NOT NULL THEN
 		CALL stdLib.popup("Task On Hold", l_reason, "information", this.mobLib.cfg.timeouts.long)
 		IF l_held THEN
@@ -331,7 +330,8 @@ FUNCTION (this mdTasks) complete(l_id STRING) RETURNS BOOLEAN
 	END IF
 
 	DEBUG(1, SFMT("complete: ID: %1 JL: %2 WC: %3", l_id, this.taskRec.job_link, this.taskRec.work_code))
-	IF NOT dbLib.completeTask(this.mdUser.branch, this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
+	IF NOT dbLib.completeTask(
+			this.mdUser.branch, this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
 		ERROR dbLib.m_lastError
 		RETURN FALSE
 	END IF
@@ -359,8 +359,7 @@ FUNCTION (this mdTasks) stop(l_id STRING) RETURNS BOOLEAN
 
 	DEBUG(1, SFMT("stop: ID: %1 JL: %2 WC: %3", l_id, this.taskRec.job_link, this.taskRec.work_code))
 	LET m_TasksArr[l_id].stopped = CURRENT
-	IF dbLib.stopTask(
-			this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].stopped) THEN
+	IF dbLib.stopTask(this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].stopped) THEN
 		LET this.rec.state                  = C_TRIMTASK_STATE_STOPPED
 		LET this.list[this.cur_idx].state   = this.rec.state
 		LET this.list[this.cur_idx].my_task = TRUE
@@ -378,7 +377,7 @@ FUNCTION (this mdTasks) takeImage() RETURNS()
 	DEFINE l_cli_uri, l_srv_fn STRING
 	DEFINE l_file, l_dte       STRING
 --	DEFINE l_data              BYTE
-	DEFINE l_func              STRING
+	DEFINE l_func STRING
 
 	IF NOT this.mobLib.feMobile THEN
 		CALL stdLib.popup("Camera", "Feature only supported on Mobile devices", "exclamation", 0)
@@ -424,14 +423,14 @@ FUNCTION (this mdTasks) takeImage() RETURNS()
 --		LOCATE l_data IN FILE l_srv_fn -- what was this for ?
 	CATCH
 		LET l_file = SFMT("File Transfer Problem!\n%1 %2", STATUS, ERR_GET(STATUS))
-		DEBUG(0, l_file )
+		DEBUG(0, l_file)
 		CALL stdLib.notify(NULL)
 		CALL stdLib.popup("Image", l_file, "info", 0)
 		RETURN
 	END TRY
 	IF STATUS != 0 THEN
 		LET l_file = SFMT("File Transfer Problem!\n%1 %2", STATUS, ERR_GET(STATUS))
-		DEBUG(0, l_file )
+		DEBUG(0, l_file)
 		CALL stdLib.notify(NULL)
 		CALL stdLib.popup("Image", l_file, "info", 0)
 	END IF
@@ -835,8 +834,8 @@ FUNCTION (this mdTasks) loadArray(l_forUser BOOLEAN)
 				IF m_TasksArr[x].list_status > 63 THEN -- Started ( by someone! )
 					LET this.list[i].state = C_TRIMTASK_STATE_STARTED
 				END IF
-				LET this.list[i].allowed = this.taskAllowed( m_TasksArr[x].work_code )
-				LET l_trimCmd = m_TasksArr[x].trim_stop
+				LET this.list[i].allowed = this.taskAllowed(m_TasksArr[x].work_code)
+				LET l_trimCmd            = m_TasksArr[x].trim_stop
 				IF m_TasksArr[x].trim = 1 THEN
 					LET l_trimCmd = m_TasksArr[x].trim_cmd
 				END IF
@@ -871,15 +870,33 @@ FUNCTION (this mdTasks) loadArray(l_forUser BOOLEAN)
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Check the employee is allowed to start/stop/complete this task
-FUNCTION (this mdTasks) taskAllowed( l_wc LIKE trim1.work_code ) RETURNS BOOLEAN
-	IF this.mdUser.emp_rec.tsk1 IS NULL THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk1 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk2 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk3 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk4 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk5 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk6 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk7 = l_wc THEN RETURN TRUE END IF
-	IF this.mdUser.emp_rec.tsk8 = l_wc THEN RETURN TRUE END IF
+FUNCTION (this mdTasks) taskAllowed(l_wc LIKE trim1.work_code) RETURNS BOOLEAN
+	IF this.mdUser.emp_rec.tsk1 IS NULL THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk1 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk2 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk3 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk4 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk5 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk6 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk7 = l_wc THEN
+		RETURN TRUE
+	END IF
+	IF this.mdUser.emp_rec.tsk8 = l_wc THEN
+		RETURN TRUE
+	END IF
 	RETURN FALSE
 END FUNCTION

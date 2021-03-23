@@ -14,7 +14,7 @@ PUBLIC DEFINE m_timeouts RECORD -- set from mobLib
 END RECORD
 
 PUBLIC DEFINE m_debug     SMALLINT
-PUBLIC DEfINE m_lastError STRING
+PUBLIC DEFINE m_lastError STRING
 PUBLIC DEFINE m_logPath   STRING
 PUBLIC DEFINE m_debugFile STRING
 PUBLIC DEFINE m_notify    BOOLEAN
@@ -64,7 +64,9 @@ FUNCTION confirm(l_msg STRING, l_def BOOLEAN, l_idle SMALLINT) RETURNS BOOLEAN
 	END IF
 	MENU "Confirm" ATTRIBUTES(STYLE = "dialog", COMMENT = l_msg, IMAGE = "question")
 		BEFORE MENU
-			IF l_def = TRUE THEN NEXT OPTION "yes" END IF
+			IF l_def = TRUE THEN
+				NEXT OPTION "yes"
+			END IF
 		ON ACTION no
 			LET l_ans = FALSE
 		ON ACTION yes
@@ -79,7 +81,7 @@ END FUNCTION
 FUNCTION debugOut(l_lev SMALLINT, l_mod STRING, l_lineno SMALLINT, l_msg STRING) RETURNS()
 	DEFINE c      base.Channel
 	DEFINE l_line STRING
-	DEFINE l_dte STRING
+	DEFINE l_dte  STRING
 
 	IF m_debug IS NULL THEN
 		LET m_debug = 0
@@ -91,8 +93,9 @@ FUNCTION debugOut(l_lev SMALLINT, l_mod STRING, l_lineno SMALLINT, l_msg STRING)
 				LET m_logPath = "."
 			END IF
 		END IF
-		LET l_dte = util.Datetime.format(CURRENT,"%Y%m%d_%H%M%S")
-		LET m_debugFile = os.path.join(m_logPath, base.Application.getProgramName() || "_" ||l_dte||"."||fgl_getPid()|| ".log")
+		LET l_dte = util.Datetime.format(CURRENT, "%Y%m%d_%H%M%S")
+		LET m_debugFile =
+				os.path.join(m_logPath, base.Application.getProgramName() || "_" || l_dte || "." || fgl_getPid() || ".log")
 		DISPLAY CURRENT, ":DebugLog:", m_debugFile
 	END IF
 	IF l_lev > m_debug THEN
@@ -159,15 +162,15 @@ FUNCTION notify(l_msg STRING) RETURNS()
 		OPEN WINDOW notify WITH FORM "notify"
 		LET m_notify = TRUE
 	END IF
-	DEBUG(2, SFMT("notify: %1", l_msg ))
+	DEBUG(2, SFMT("notify: %1", l_msg))
 	DISPLAY l_msg TO msg
 	CALL ui.Interface.refresh()
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
--- Show the password 
-FUNCTION toggleShowPass( l_node om.domNode, l_show BOOLEAN )
+-- Show the password
+FUNCTION toggleShowPass(l_node om.domNode, l_show BOOLEAN)
 	CALL l_node.setAttribute("isPassword", l_show)
-	CALL l_node.setAttribute("image",IIF( l_show, "visibility","visibility_off"))
+	CALL l_node.setAttribute("image", IIF(l_show, "visibility", "visibility_off"))
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Generate a unique ID

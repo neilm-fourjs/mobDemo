@@ -106,7 +106,8 @@ MAIN
 		CALL fgldialog.fgl_winMessage("Error", SFMT("Invalid App URL: %1", m_cfg.ws_rep.url), "exclamation")
 		CALL exitProgram(1)
 	END IF
-	LET m_cfg.ws_rep.url = m_cfg.ws_rep.url.append(SFMT("?Arg=%1&Arg=%2&Arg=%3",m_cfg.ws_rep.dbname,m_cfg.ws_rep.ip, C_ROS_VER))
+	LET m_cfg.ws_rep.url =
+			m_cfg.ws_rep.url.append(SFMT("?Arg=%1&Arg=%2&Arg=%3", m_cfg.ws_rep.dbname, m_cfg.ws_rep.ip, C_ROS_VER))
 	TRY
 		LET l_st  = CURRENT
 		LET l_res = "failed"
