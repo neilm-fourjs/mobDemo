@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<APPLICATION Parent="defaultgwc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.4js.com/ns/gas/3.20/cfextwa.xsd">
+	<EXECUTION AllowUrlParameters="TRUE">
+		<ENVIRONMENT_VARIABLE Id="FGLIMAGEPATH">..:$(res.fgldir)/lib/image2font.txt</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="MDDATA">.</ENVIRONMENT_VARIABLE>
+		<ENVIRONMENT_VARIABLE Id="MDDEBUG">3</ENVIRONMENT_VARIABLE>
+		<PATH>$(res.deployment.path)</PATH>
+		<MODULE>mdAddServer</MODULE>
+	</EXECUTION>
+</APPLICATION>

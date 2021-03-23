@@ -1,0 +1,37 @@
+
+TOOLBAR
+	ITEM close (IMAGE="back")
+END -- TB
+
+LAYOUT (TEXT="About",STYLE="main2")
+GRID
+{
+[txt                ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+[                   ]
+---------------------
+[clear              ]
+[a                  ]
+[s                  ]
+[back               ]
+}
+END -- GRID
+
+ATTRIBUTES
+TEXTEDIT txt = FORMONLY.txt, STRETCH=BOTH, STYLE="noborder", FONTPITCH=FIXED;
+
+BUTTON clear : clear, TEXT="Clear Registion", IMAGE="refresh" , STYLE="menubutton";
+BUTTON a : about, TEXT="GMA About", IMAGE="info" , STYLE="menubutton";
+BUTTON s : settings, TEXT="GMA Settings", IMAGE="settings" , STYLE="menubutton", HIDDEN;
+BUTTON back : close, TEXT="Back", IMAGE="back" , STYLE="menubutton2";

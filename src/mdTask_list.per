@@ -1,0 +1,38 @@
+
+TOOLBAR
+	ITEM close (IMAGE="back")
+	ITEM refresh
+END -- TB
+
+LAYOUT ( TEXT="Task List", STYLE="main2" )
+VBOX
+GRID
+{
+[title                ]
+}
+END -- GRID
+TABLE ( STYLE="listview listview1",  DOUBLECLICK=ACCEPT )
+{
+[l001|l002]
+}
+END -- TABLE
+GRID ( STYLE="center" )
+{
+[spacer1]
+[back                ]
+}
+END -- GRID
+END -- VBOX
+
+ATTRIBUTES
+LABEL TITLE = FORMONLY.TITLE;
+l001 = FORMONLY.line1, IMAGECOLUMN=img, STYLE="line1";
+LABEL l002 = FORMONLY.line2, STYLE="html line2";
+PHANTOM FORMONLY.img;
+PHANTOM FORMONLY.id;
+
+IMAGE spacer1 = formonly.gap1, STRETCH=X, STYLE="noborder";
+BUTTON back : close, IMAGE="back", TEXT="Back", STYLE="menubutton2";
+
+INSTRUCTIONS
+SCREEN RECORD scr_arr ( FORMONLY.line1 THRU FORMONLY.id )

@@ -1,0 +1,48 @@
+
+TOOLBAR
+	ITEM accept
+	ITEM cancel
+	ITEM about
+END -- TB
+
+LAYOUT ( TEXT="Login", STYLE="login form1" )
+VBOX
+GRID ( STYLE="center" )
+{
+[""]
+<G login                 >
+ [logo                  ]
+ [                      ]
+ [                      ]
+ [titl                  ]
+ [""]
+ [usr                   ]
+ [""]
+ [pwd                   ]
+ [""]
+ [brn                   ]
+ [""]
+ [login                 ]
+ [""]
+<                        >
+[""]
+}
+END -- GRID
+GRID (STYLE="center")
+{
+[info                 ]
+}
+END -- GRID
+END -- VBOX
+
+ATTRIBUTES
+IMAGE logo : logo, IMAGE="logo", AUTOSCALE, WIDTH=191 PIXELS, HEIGHT=69 PIXELS, SIZEPOLICY=FIXED, STYLE="noborder centerlogo";
+GROUP login : login, STYLE="big loginbox center";
+LABEL titl = FORMONLY.titl, JUSTIFY=CENTER;
+
+usr = FORMONLY.usr, REQUIRED, NOT NULL, UPSHIFT, PLACEHOLDER="Username";
+BUTTONEDIT pwd = FORMONLY.pwd, INVISIBLE, REQUIRED, NOT NULL,PLACEHOLDER="Password",  ACTION=showpass, STYLE="password";
+COMBOBOX brn = FORMONLY.brn, REQUIRED, NOT NULL, PLACEHOLDER="Branch";
+
+BUTTON login : accept, TEXT="LOGIN", IMAGE="", STYLE="login_button";
+LABEL info = FORMONLY.info, HIDDEN, STYLE="infohtml";

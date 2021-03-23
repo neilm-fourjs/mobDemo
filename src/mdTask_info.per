@@ -1,0 +1,71 @@
+
+TOOLBAR
+	ITEM close (IMAGE="back")
+END -- TB
+
+LAYOUT  (TEXT="Task Information", STYLE="form1" )
+VBOX
+GRID (STYLE="center")
+{
+<G ti                >
+ [l001|f001     ]
+ [l02a|f02a  |f02c  ]
+ [l02b|f02b         ]
+ [l003|f003         ]
+ [l004|f004         ]
+ [l005|f005    |f5  ]
+ [l006        |f006 ]
+ [l007    |f007     ]
+}
+END -- GRID
+GRID
+{
+[sp]
+[mtitle             ]
+[but1               ]
+[but2               ]
+[but3               ]
+[but4               ]
+[but5               ]
+[but6               ]
+[but7               ]
+[but8               ]
+}
+END -- GRID
+END -- VBOX
+ATTRIBUTES
+
+GROUP ti : ti, STYLE="med";
+
+IMAGE sp : sp, IMAGE="fa-space", STRETCH=BOTH;
+LABEL mtitle = FORMONLY.menu_title, HIDDEN, STYLE="big bold";
+
+LABEL l001 : lab1, TEXT="Job No:";
+f001 = FORMONLY.job_number;
+LABEL l02a : lab2a, TEXT="Vehicle Reg:";
+f02a = FORMONLY.veh_reg, SCROLL;
+LABEL l02b : lab2b, TEXT="Vehicle:";
+f02b = FORMONLY.veh;
+f02c = FORMONLY.veh_clr;
+LABEL l003 : lab3, TEXT="Customer:";
+f003 = FORMONLY.contact;
+LABEL l004 : lab4, TEXT="Task:";
+f004 = FORMONLY.list_title;
+LABEL l005 : lab5, TEXT="Task Status:";
+f005 = FORMONLY.state_desc;
+f5 = FORMONLY.state, STYLE="small", SCROLL;
+LABEL l006 : lab6, TEXT="Time Remaining:";
+f006 = FORMONLY.time_remaining;
+LABEL l007 : lab7, TEXT="Scheduled Handover:";
+f007 = FORMONLY.scheduled_handover;
+
+--IMAGE spacer1 = formonly.gap1, STRETCH=X, SIZEPOLICY=FIXED, HEIGHT=8 PIXELS, STYLE="noborder";
+
+BUTTON but1 : opt1, HIDDEN, STYLE="menubutton";
+BUTTON but2 : opt2, HIDDEN, STYLE="menubutton";
+BUTTON but3 : opt3, HIDDEN, STYLE="menubutton";
+BUTTON but4 : opt4, HIDDEN, STYLE="menubutton";
+BUTTON but5 : opt5, HIDDEN, STYLE="menubutton";
+BUTTON but6 : opt6, HIDDEN, STYLE="menubutton";
+BUTTON but7 : opt7, HIDDEN, STYLE="menubutton";
+BUTTON but8 : opt8, HIDDEN, STYLE="menubutton";

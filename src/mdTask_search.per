@@ -1,0 +1,20 @@
+LAYOUT ( TEXT="Search", STYLE="main2" )
+VBOX
+GRID ( STYLE="center" )
+{
+[title                   ]
+Search screen goes here!
+}
+END -- GRID
+GRID (STYLE="center")
+{
+[sp]
+[back               ]
+}
+END -- GRID
+END -- VBOX
+ATTRIBUTES
+LABEL title = FORMONLY.menu_title, SIZEPOLICY=DYNAMIC, STYLE="noborder big center";
+
+IMAGE sp : sp, IMAGE="fa-space", STRETCH=Y;
+BUTTON back : back, STYLE="menubutton2";

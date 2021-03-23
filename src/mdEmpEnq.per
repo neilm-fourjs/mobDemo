@@ -1,0 +1,45 @@
+
+LAYOUT ( TEXT="Employee Enquiry", STYLE="form1" )
+VBOX
+GRID ( STYLE="center" )
+{
+<G emp                   >
+ Employee:
+ [f001                  ]
+ ClockedOn:
+ [c001                  ]
+ [""]
+ Current Tasks:    [f002]
+ Allocated Tasks:  [f003]
+ [""]
+<                        >
+<G clg                   >
+ Today:        [cl01    ]
+ Week to Date: [cl02    ]
+ Month to Date:[cl03    ]
+}
+END -- GRID
+GRID ( STYLE="center" )
+{
+[spacer1]
+----------------------
+[back                ]
+}
+END -- GRID
+END -- VBOX
+
+ATTRIBUTES
+GROUP emp : emp, STYLE="med";
+GROUP clg : clg, TEXT="Claimed Time:", STYLE="med";
+f001 = FORMONLY.full_name;
+c001 = FORMONLY.clockedOn, JUSTIFY=LEFT;
+
+f002 = FORMONLY.active;
+f003 = FORMONLY.allocated_tasks;
+
+cl01 = FORMONLY.claim_today;
+cl02 = FORMONLY.claim_wtd;
+cl03 = FORMONLY.claim_mtd;
+
+IMAGE spacer1 = formonly.gap1, STRETCH=BOTH, STYLE="noborder";
+BUTTON back : close, TEXT="Back", IMAGE="back", STYLE="menubutton2";

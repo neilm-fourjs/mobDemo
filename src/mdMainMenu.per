@@ -1,0 +1,53 @@
+
+TOOLBAR
+	ITEM close (IMAGE="quit")
+END -- TB
+
+LAYOUT (TEXT="Menu", STYLE="main2")
+VBOX
+GRID ( STYLE="center" )
+{
+[sp1]
+[img|user          ]
+[   |s :status     ]
+[   ]
+[sp2]
+}
+END -- GRID
+GRID ( STYLE="center" )
+{
+[spacer1]
+[opt1              ]
+[opt2              ]
+[opt3              ]
+[opt4              ]
+[opt5              ]
+[opt6              ]
+[opt7              ]
+[opt8              ]
+[spacer2]
+[opt9              ]
+[spacer3]
+}
+END -- GRID
+END -- VBOX
+ATTRIBUTES
+IMAGE sp1 : sp1, IMAGE="x", HEIGHT=30 PIXELS, STYLE="noborder";
+IMAGE sp2 : sp2, IMAGE="remove", HEIGHT=10 PIXELS, STYLE="noborder";
+IMAGE img = FORMONLY.img, STYLE="noborder", HEIGHT=75 PIXELS, WIDTH=75 PIXELS, SIZEPOLICY=FIXED, AUTOSCALE;
+LABEL user = FORMONLY.usern, STYLE="vbig";
+IMAGE s = FORMONLY.imgstat, STYLE="noborder icon32 teal", AUTOSCALE;
+LABEL status = FORMONLY.status, STYLE="teal vbig";
+
+IMAGE spacer1 = formonly.gap1, STRETCH=BOTH, STYLE="noborder";
+BUTTON opt1 : opt1, STYLE="menubutton", TAG="menu";
+BUTTON opt2 : opt2, STYLE="menubutton", TAG="menu";
+BUTTON opt3 : opt3, STYLE="menubutton", TAG="menu";
+BUTTON opt4 : opt4, STYLE="menubutton", TAG="menu";
+BUTTON opt5 : opt5, STYLE="menubutton", TAG="menu";
+BUTTON opt6 : opt6, STYLE="menubutton", TAG="menu";
+BUTTON opt7 : opt7, STYLE="menubutton", TAG="menu";
+BUTTON opt8 : opt8, STYLE="menubutton", TAG="menu";
+IMAGE spacer2 = formonly.gap2, STRETCH=BOTH, STYLE="noborder";
+BUTTON opt9 : opt9, STYLE="menubutton2", TAG="menu";
+IMAGE spacer3 = formonly.gap3, STRETCH=BOTH, STYLE="noborder";

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ANSI_X3.4-1968"?>
+<ActionDefaultList>
+  <ActionDefault name="about" image="information" text="" acceleratorName="f1" contextMenu="no"/>
+  <ActionDefault name="back" image="back" text="Back" acceleratorName="escape" contextMenu="no"/>
+  <ActionDefault name="clockevent" text="Clock on" image="clockevent" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="curtasks" text="Current tasks" image="curtasks" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="mytasks" text="Allocated tasks" image="mytasks" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="wip" text="Work in progress" image="wip" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="jobs" text="Jobs onsite" image="jobs" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="search" text="Search" image="search" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="logoff" text="Log off" image="quit" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="empenq" text="Employee Enquiry" image="empenq" contextMenu="no" defaultView="no"/>
+  <ActionDefault name="quit" text="Quit" image="quit" contextMenu="no"/>
+  <ActionDefault name="refresh" text="Refresh" image="refresh" contextMenu="yes"/>
+  <ActionDefault name="showpass" text="" image="visibility" contextMenu="yes"/>
+
+  <ActionDefault name="no" text="CANCEL" contextMenu="no"/>
+  <ActionDefault name="yes" text="YES" contextMenu="no"/>
+  <ActionDefault name="continue" text="CONTINUE" contextMenu="no"/>
+
+  <ActionDefault name="enterbackground" validate="no" defaultView="no" contextMenu="no"/>
+  <ActionDefault name="enterforeground" validate="no" defaultView="no" contextMenu="no"/>
+
+  <ActionDefault name="test" text="Test" image="pest_control" acceleratorName="F2" defaultView="no" contextMenu="no"/>
+
+  <ActionDefault name="accept" image="accept" text="Accept" acceleratorName="Return" acceleratorName2="Enter" contextMenu="no"/>
+  <ActionDefault name="cancel" image="cancel" text="Cancel" validate="no" acceleratorName="Escape" contextMenu="no"/>
+  <ActionDefault name="insert" text="Insert" acceleratorName="F3" contextMenu="no"/>
+  <ActionDefault name="append" text="Append" acceleratorName="Control-F3" contextMenu="no"/>
+  <ActionDefault name="update" text="Update" contextMenu="no"/>
+  <ActionDefault name="delete" validate="no" text="Delete" acceleratorName="F4" contextMenu="no"/>
+  <ActionDefault name="help" validate="no" defaultView="no" text="Help" acceleratorName="F1" contextMenu="no"/>
+  <ActionDefault name="close" validate="no" text="" acceleratorName="Alt-F4" defaultView="no" contextMenu="no"/>
+  <ActionDefault name="interrupt" text="Interrupt" contextMenu="no"/>
+  <ActionDefault name="next" text="Next" image="goforw" comment="Next record" contextMenu="no"/>
+  <ActionDefault name="previous" text="Previous" image="gorev" comment="Previous record" contextMenu="no"/>
+  <ActionDefault name="first" text="First" image="gobegin" comment="First record" contextMenu="no"/>
+  <ActionDefault name="last" text="Last" image="goend" comment="Last record" contextMenu="no"/>
+  <ActionDefault name="print" text="Print" image="printer" comment="Print" contextMenu="no"/>
+  <ActionDefault name="find"     acceleratorName="Control-F" text="Find" image="find" comment="Search"/>
+  <ActionDefault name="findnext" acceleratorName="Control-G" text="Find Next" image="findnext" comment="Search"/>
+  <ActionDefault name="editcopy" text="Copy" image="copy" comment="Copy" acceleratorName="Control-C" contextMenu="no"/>
+  <ActionDefault name="editcut" text="Cut" image="cut" comment="Cut" acceleratorName="Control-X" contextMenu="no"/>
+  <ActionDefault name="editpaste" text="Paste" image="paste" comment="Paste" acceleratorName="Control-V" contextMenu="no"/>
+  <ActionDefault name="nextfield" text="Next Field" acceleratorName="Tab" contextMenu="no"/>
+  <ActionDefault name="prevfield" text="Previous Field" acceleratorName="Shift-Tab" contextMenu="no"/>
+  <ActionDefault name="nextrow" text="Next" image="goforw" acceleratorName="Down" contextMenu="no"/>
+  <ActionDefault name="prevrow" text="Previous" image="gorev" acceleratorName="Up" contextMenu="no"/>
+  <ActionDefault name="firstrow" text="First" image="gobegin" acceleratorName="Home" contextMenu="no"/>
+  <ActionDefault name="lastrow" text="Last" image="goend" acceleratorName="End" contextMenu="no"/>
+  <ActionDefault name="nextpage" text="Next Page" acceleratorName="Next" contextMenu="no"/>
+  <ActionDefault name="prevpage" text="Previous Page" acceleratorName="Prior" contextMenu="no"/>
+  <ActionDefault name="nexttab" text="Next Folder Tab" acceleratorName="Control-Tab" contextMenu="no"/>
+  <ActionDefault name="prevtab" text="Previous Folder Tab" acceleratorName="Control-Shift-Tab" contextMenu="no"/>
+  <ActionDefault name="dialogtouched" validate="no" defaultView="no"  contextMenu="no"/>
+</ActionDefaultList>

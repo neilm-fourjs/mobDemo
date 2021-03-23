@@ -1,0 +1,96 @@
+
+BODY {
+	font-family: Roboto, Helvetica, sans-serif;
+}
+
+#logo {
+	text-align: center;
+}
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.gmi {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 42px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+#menuimg {
+	text-align: center;
+	height: 40px;
+	line-height: 36px;
+	font-size: 1.4em;
+	border: 1px solid black;
+}
+
+#menu {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-content: flex-center;
+	align-items: stretch;
+	font-weight: 400;
+	text-color: black;
+}
+
+.disabled {
+	font-weight: 200;
+	text-color: #e0e0e0;
+	opacity: 0.5;
+}
+
+#menuitem {
+	width: 100px;
+	padding: 2px;
+	text-align: center;
+	cursor: pointer;
+	padding-bottom: 20px;
+}
+
+#menuimg {
+	text-align: center;
+	height: 40px;
+	line-height: 36px;
+	border: none;
+}
+
+#menutxt {
+	text-align: center;
+	font-size: 1.4em;
+	color: #353641;
+//	border: 1px solid black;
+}
+
+
+#debug {
+	background-color: #ffdddd;
+	border: solid 1px black;
+	display: none;
+}

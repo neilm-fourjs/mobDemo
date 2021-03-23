@@ -1,0 +1,34 @@
+
+LAYOUT (TEXT="Configure Remote Launch URLs", STYLE="main2")
+GRID
+{
+Server:     [f000                                                          ]
+Service Ver:[sver] DB:[dver]
+API Name:   [f001             ]
+IP Addr:    [f002             ] New:[f02a             ]
+DB Name:    [f003             ]
+URL:        [f004                                                          ]
+Added:      [f005                                ]
+Info:       [f006                                                          ]
+            [                                                              ]
+[""]
+[accept][exit] [add][delete]
+}
+END -- GRID
+
+ATTRIBUTES
+f000 = FORMONLY.server, NOENTRY;
+sver = FORMONLY.serviceVersion;
+dver = FORMONLY.dbVersion;
+f001 = FORMONLY.api, DOWNSHIFT, NOT NULL, REQUIRED;
+COMBOBOX f002 = FORMONLY.ip, DOWNSHIFT, NOT NULL, REQUIRED;
+f02a = FORMONLY.l_ip, NOT NULL;
+f003 = FORMONLY.dbname, NOT NULL, REQUIRED;
+f004 = FORMONLY.URL, NOT NULL, REQUIRED;
+f005 = FORMONLY.added, NOENTRY;
+TEXTEDIT f006 = FORMONLY.info, NOENTRY;
+
+BUTTON accept : accept, TEXT="Accept", IMAGE="fa-check";
+BUTTON exit : exit, TEXT="Exit", IMAGE="fa-power-off";
+BUTTON add : add, TEXT="Add IP", IMAGE="fa-plus";
+BUTTON delete : delete, TEXT="Delete", IMAGE="fa-close";

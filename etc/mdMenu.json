@@ -1,0 +1,68 @@
+{
+	"menu": [
+		{
+			"text": "Clock On/Off",
+			"image": "alarm_on",
+			"imgcolour": "#00b4a5",
+			"action": "clockevent",
+			"active": true
+		},
+		{
+			"text": "Current Task(s)",
+			"image": "assignment",
+			"imgcolour": "#00b4a5",
+			"action": "curtasks",
+			"active": true
+		},
+		{
+			"text": "Allocated Task(s)",
+			"image": "assignment_ind",
+			"imgcolour": "#00b4a5",
+			"action": "mytasks",
+			"active": true
+		},
+		{
+			"text": "_WIP",
+			"image": "timeline",
+			"imgcolour": "#00b4a5",
+			"action": "wip",
+			"active": false
+		},
+
+		{
+			"text": "Jobs Onsite",
+			"image": "place",
+			"action": "jobs",
+			"imgcolour": "#00b4a5",
+			"active": false
+		},
+		{
+			"text": "Search",
+			"image": "search",
+			"imgcolour": "#00b4a5",
+			"action": "search",
+			"active": true
+		},
+		{
+			"text": "Employee Enquiry",
+			"image": "person_outline",
+			"imgcolour": "#00b4a5",
+			"action": "empenq",
+			"active": true
+		},
+		{
+			"text": "",
+			"image": "",
+			"imgcolour": "",
+			"action": "dummy",
+			"active": false
+		},
+		{
+			"text": "Log off",
+			"image": "power_settings_new",
+			"imgcolour": "#000000",
+			"action": "logoff",
+			"active": true
+		}
+	]
+}

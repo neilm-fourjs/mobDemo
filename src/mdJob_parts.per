@@ -1,0 +1,60 @@
+
+TOOLBAR
+	ITEM close (IMAGE="back")
+END -- TB
+
+LAYOUT  (TEXT="Parts / Sublet", STYLE="form1" )
+VBOX
+GRID (STYLE="center")
+{
+<G ti                 >
+[l001|f001     ]
+[l02a|f02a   |f02c   ]
+[l02b|f02b           ]
+[l003|f003           ]
+[l007      |f007     ]
+}
+END -- GRID
+TABLE parts ( STYLE="listview listview1", DOUBLECLICK=select )
+{
+[a001 |a002 ]
+[a001 |a002 ]
+[a001 |a002 ]
+[a001 |a002 ]
+[a001 |a002 ]
+}
+END -- TABLE
+GRID -- (STYLE="center")
+{
+[sp]
+[back                ]
+}
+END -- GRID
+END -- VBOX
+ATTRIBUTES
+GROUP ti : ti, STYLE="med";
+IMAGE sp : sp, IMAGE="fa-space", STRETCH=BOTH;
+
+LABEL l001 : lab1, TEXT="Job No:";
+f001 = FORMONLY.job_number;
+LABEL l02a : lab2a, TEXT="Vehicle Reg:";
+f02a = FORMONLY.veh_reg, SCROLL;
+LABEL l02b : lab2b, TEXT="Vehicle:";
+f02b = FORMONLY.veh;
+f02c = FORMONLY.veh_clr;
+LABEL l003 : lab3, TEXT="Customer:";
+f003 = FORMONLY.contact;
+
+LABEL l007 : lab7, TEXT="Scheduled Handover:";
+f007 = FORMONLY.scheduled_handover;
+
+LABEL a001 = FORMONLY.line1, IMAGECOLUMN=line_img, STYLE="html line1";
+LABEL a002 = FORMONLY.line2, STYLE="html line2";
+PHANTOM FORMONLY.line_img;
+
+--IMAGE spacer1 = formonly.gap1, STRETCH=X, SIZEPOLICY=FIXED, HEIGHT=8 PIXELS, STYLE="noborder";
+
+BUTTON back : back, STYLE="menubutton2";
+
+INSTRUCTIONS
+SCREEN RECORD arr ( FORMONLY.line1 THRU FORMONLY.line_img )

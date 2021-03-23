@@ -1,0 +1,49 @@
+
+TOOLBAR
+	ITEM accept
+	ITEM cancel
+	ITEM about
+END -- TB
+
+LAYOUT ( TEXT="Application Registration", STYLE="form1" )
+GRID ( STYLE="center" )
+{
+<G logo                   >
+[logo                    ]
+[                        ]
+[                        ]
+<                         >
+[""]
+<G reg                    >
+[titl                    ]
+ [l000             ]
+ [f000             ]
+ [l001     ]
+ [f001]
+ [l002     ]
+ [f002]
+ [l003     ]
+ [f003             ]
+ [""]
+ [help                    ]
+ [                        ]
+ [                        ]
+}
+END -- GRID
+
+ATTRIBUTES
+IMAGE logo : logo, IMAGE="logo", AUTOSCALE, SIZEPOLICY=INITIAL, STYLE="noborder center";
+LABEL titl = FORMONLY.titl, JUSTIFY=CENTER, STYLE="big";
+GROUP logo : logo, STYLE="center";
+GROUP reg : reg, STYLE="center med";
+LABEL l000 : dev_id, TEXT="Device ID:";
+LABEL l001 : cono, TEXT="Company:";
+LABEL l002 : user_id, TEXT="User:";
+LABEL l003 : pss, TEXT="Password:";
+
+TEXTEDIT help = FORMONLY.formhelp, STYLE="noborder", STRETCH=BOTH;
+
+f000 = FORMONLY.dev_id2, NOENTRY, SCROLL;
+f001 = FORMONLY.cono;
+f002 = FORMONLY.user_id, DOWNSHIFT;
+f003 = FORMONLY.l_pwd, INVISIBLE;

@@ -1,0 +1,15 @@
+
+# Defaults for WS call.
+
+my.ws.server = "generodemos.dynu.net"
+my.ws.gasalias = "z"
+
+my.ws.wsxcf = "mdSrvApp"
+my.ws.wsapp = "mdsrv"
+my.ws.wsapi = "mdtest"
+
+config.version = 1
+
+security.global.ca = "ClientCAList.pem"
+
+# NOTE we don't set the UI to UR or Native.

@@ -1,0 +1,34 @@
+
+LAYOUT (TEXT="Menu", STYLE="main2")
+GRID ( STYLE="center" )
+{
+[sp1]
+ [img][user         ]
+ [   ][s|status     ]
+ [sp2               ]
+[menu                ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+[                    ]
+}
+END -- GRID
+ATTRIBUTES
+IMAGE sp1 : sp1, IMAGE="x", HEIGHT=30 PIXELS, STYLE="noborder";
+IMAGE sp2 : sp2, IMAGE="remove", HEIGHT=3 PIXELS, STYLE="noborder grey_bg";
+IMAGE img = FORMONLY.img, STYLE="noborder", HEIGHT=75 PIXELS, WIDTH=75 PIXELS, SIZEPOLICY=FIXED, AUTOSCALE;
+LABEL user = FORMONLY.usern, STYLE="vbig";
+IMAGE s = FORMONLY.imgstat, STYLE="noborder icon32 teal", AUTOSCALE;
+LABEL status = FORMONLY.status, STYLE="teal vbig";
+
+
+WEBCOMPONENT menu=FORMONLY.l_iconmenu, TABINDEX=0,
+   COMPONENTTYPE="menu",
+   SIZEPOLICY=FIXED,
+   STRETCH=BOTH,
+   SCROLLBARS=NONE;
