@@ -22,6 +22,6 @@
 	<UA_OUTPUT>
 		<PROXY>$(res.uaproxy.cmd)</PROXY>
 		<PUBLIC_IMAGEPATH>$(res.public.resources)</PUBLIC_IMAGEPATH>
-		<GBC>gbc-mob</GBC>
+		<GBC>gbc-mobDemo</GBC>
 	</UA_OUTPUT>
 </APPLICATION>

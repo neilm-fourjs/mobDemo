@@ -1,0 +1,61 @@
+{
+	"Xaui-mobileUI-default": "true",
+
+	"bms-button-border-color": "#2ec2b6",
+	"bms-primary": "#084267",
+	"bms-light-grey": "#f4f4f4",
+	"bms-dark-grey": "#707070",
+	"bms-icon-color": "#00b4a5",
+	"bms-width": "435px",
+
+	"theme-disable-context-menu": false,
+
+	"theme-font-family": "'Roboto, Helvetica, sans-serif'",
+	"theme-font-weight": "300",
+	"theme-font-size-ratio": ".8",
+	"theme-combobox-padding": "0px",
+	"theme-sidebar-always-visible-min-width": "1921px",
+	"theme-host-action-default-height": "36px",
+  "theme-margin-ratio": ".4",
+  "theme-field-height-ratio": ".4",
+  "theme-radiobutton-size": "12px",
+  "theme-checkbox-size": "12px",
+	"gbc-ChromeBarWidget-height": "42px",
+	"gbc-ChromeBarWidget-visible-items": "about uploadStatus runtimeStatus settings",
+
+	"Xtheme-grid-inner-gutter-y": 10,
+
+	"xpalette-primary": "$mt-blue-grey",
+	"palette-primary": "$bms-primary",
+	"palette-secondary": "$mt-grey",
+	"palette-text-secondary": "$mt-black",
+	"theme-primary-background-color": "$palette-primary-800",
+	"theme-primary-emphasis-background-color": "$palette-primary-900",
+	"theme-primary-faded-background-color": "$palette-primary-100",
+	"theme-primary-color": "$palette-secondary-50",
+	"theme-secondary-color": "$palette-text-secondary-100",
+	"theme-header-color": "$palette-secondary-200",
+
+	"theme-currentrow-background-color": "$mt-light-blue-400",
+	"theme-currentrow-color": "$palette-text-secondary",
+
+  "mt-field-default-height": "28px",
+
+	"mt-field-border-width-top": "1px",
+	"mt-field-border-width-right": "1px",
+	"mt-field-border-width-bottom": "1px",
+	"mt-field-border-width-left": "1px",
+	"mt-field-border-color": "$theme-primary-background-color",
+
+	"gbc-ButtonWidget-color": "x",
+	"mt-button-margin-ratio": ".25",
+	"mt-button-primary-emphasis-background-color": "$mt-white",
+	"mt-button-primary-background-color": "$mt-white",
+	"mt-button-primary-color": "$palette-text-secondary",
+	"mt-button-disabled-color": "$palette-secondary-500",
+
+	"mt-progress-height": "20px",
+	"mt-progress-background-color": "$mt-white",
+	"mt-progress-color": "$mt-light-blue-400"
+
+}

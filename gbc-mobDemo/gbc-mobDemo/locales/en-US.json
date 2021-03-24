@@ -1,0 +1,190 @@
+{
+  "gwc": {
+    "lngName": "English",
+    "app": {
+      "ending": {
+        "title": "The application ended",
+        "session": "Session ID",
+        "redirect": "Your session has ended. You will be automatically redirected in a few seconds."
+      },
+      "notFound": {
+        "title": "The application has not been found",
+        "message": "The application __appId__ didn't start because it wasn't found.<br> Be sure your application exists and try to restart the same app"
+      },
+      "error": {
+        "message": "The application encountered a problem"
+      },
+      "forbidden": {
+        "message": "The application encountered an access issue"
+      },
+      "webcompNotFound": {
+        "message": "Webcomponent not found or method 'onICHostReady' is not present : this application cannot continue!"
+      },
+      "webcompError": {
+        "message": "Webcomponent threw an error"
+      },
+      "autologout": {
+        "message": "You have been logged out"
+      },
+      "uaProxy": {
+        "message": "The application stopped unexpectedly"
+      },
+      "logs": {
+        "vm": "Get the VM logs",
+        "proxy": "Get the proxy logs",
+        "gbc": "Get the GBC logs"
+      },
+      "waiting": "Waiting for connection",
+      "restart": "Restart the same application",
+      "busy": "Application is busy",
+      "noload": "If it doesn't load, click here",
+      "run": "Run",
+      "close": "Close",
+      "networkError": "The application is no longer available (error %1)."
+    },
+    "welcome": {
+      "history": "History",
+      "bookmark": "Bookmarks",
+      "urlLauncher": "UA Url launcher"
+    },
+    "date": {
+      "monthList": "January,February,March,April,May,June,July,August,September,October,November,December",
+      "dayList": "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday",
+      "weekdaysShort": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+      "previousMonth": "Previous Month",
+      "nextMonth": "Next Month",
+      "midnight": "Midnight",
+      "noon": "Noon"
+    },
+    "button": {
+      "ok": "OK",
+      "cancel": "Cancel"
+    },
+    "contextMenu": {
+      "restoreColumnSort": "Reset column sort",
+      "showAllColumns": "Show all columns",
+      "disable": "Disable",
+      "readOnly": "Read only",
+      "clearSettings": "Clear settings",
+      "restoreDefaultSettings": "Reset settings",
+      "clearStoredSettingsQuestion": "Do you want to clear stored settings ? (Please restart the application for changes to take effect.)",
+      "freezeLeft": "Freeze to left",
+      "freezeRight": "Freeze to right",
+      "unfreezeAll": "Unfreeze all",
+      "hideAllButSelected": "Hide all but selected",
+      "selectAll": "Select all",
+      "copyRow": "Copy row",
+      "copyCell": "Copy cell",
+      "autoFitAllColumns": "AutoFit all columns",
+      "fitToViewAllColumns": "Fit to view all columns"
+    },
+    "file": {
+      "upload": {
+        "droporclick": "Drop file here or click to upload.",
+        "droporclick-multiple": "Drop files here or click to upload.",
+        "select": "Select file",
+        "select-multiple": "Select files",
+        "processing": "Upload in progress",
+        "nofile": "No file provided",
+        "upload": "Upload",
+        "ready": "Ready to upload",
+        "waiting": "waiting",
+        "confirmation": "Upload the file ?",
+        "confirmation-multiple": "Upload the files ?",
+        "uploading": "Uploading",
+        "required": "You must select a file to upload",
+        "accept": "Expecting a file with extension",
+        "accept-multiple": "Expecting files with extension"
+      },
+      "clickForDownload": "Click here if the download doesn't start automatically.",
+      "select": "Select file"
+    },
+    "clipboard": {
+      "title": "To copy this in your clipboard, hit your system Copy shortcut (usually Ctrl+C)",
+      "copy": "Copy",
+      "paste": "Paste"
+    },
+    "storedSettings": {
+      "configuration": "Stored Settings configuration",
+      "settings": "Stored Settings",
+      "theme": "Interface theme",
+      "uiLanguage": "Interface language",
+      "defaultLng": "Use browser default",
+      "disable": "Disable Stored Settings",
+      "enable": "Enable Stored Settings",
+      "reset": "Reset Stored Settings",
+      "confirm": "Are you sure?",
+      "changed": "Stored settings have been changed. Please restart the application for changes to take effect.",
+      "done": "Done!",
+      "message": "Message",
+      "messageContent": "Something is wrong with your browser's local storage"
+    },
+    "settings": "Settings",
+    "decimalSeparator": ".",
+    "session": {
+      "logprompt": {
+        "logneeded": "Your credentials have been invalidated, please log-in again",
+        "relog": "login"
+      },
+      "waitingend": {
+        "title": "Your session is still running",
+        "message": "Your current session is still running. If you close this page, all pending applications in this session will be terminated."
+      }
+    },
+    "main": {
+      "sidebar": {
+        "title": "My Genero applications",
+        "multitab_title": "My Application's windows"
+      },
+      "chromebar": {
+        "appInfo": "GBC Information",
+        "debugTools": "Debug Tools",
+        "runInGDC": "Run in GDC",
+        "proxyLog": "Proxy logs",
+        "vmLog": "VM logs",
+        "settings": "Settings",
+        "bookmark": "Bookmark",
+        "bookmarkAlt": "Bookmark this application",
+        "close": "Close Window",
+        "getRecordedLog": "Click to here get the log",
+        "filter": "Filter"
+      }
+    },
+    "logPlayer": {
+      "unsavedConfirm": "An unsaved log already exists! \nDo you want to download it before starting a new session?",
+      "recordingLog": "Recording log",
+      "notEnabled": "Log recorder is not enabled!, use queryString ?recordGbcLog=1",
+      "logInfo": {
+        "headers": {
+          "browser": "BROWSER",
+          "themeVariables": "THEME VARIABLES",
+          "storedSettings": "STORED SETTINGS"
+        },
+        "version": "Version",
+        "platform": "Platform",
+        "protocol": "Protocol",
+        "theme": "Theme",
+        "availableThemes": "Available themes",
+
+        "sidebar": "SideBar visible",
+        "userAgent": "User Agent",
+        "os": "OS",
+        "lang": "Language",
+        "availableLang": "Available languages",
+        "dimension": "Dimension",
+        "url": "URL"
+      },
+      "topBar": {
+        "logFile": "Log File",
+        "statistics": "Statistics",
+        "statisticsTitle": "Enable statistics",
+        "delayFromLog": "Use delay from log",
+        "showHelpers": "Show interactions helpers",
+        "showHelpersTitle": "Display keys pressed, and mouse pointer",
+        "controls": "Controls",
+        "gotoStep": "Go to Step",
+        "delay": "Delay"
+      }
+    }
+  }
+}

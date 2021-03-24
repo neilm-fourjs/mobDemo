@@ -1,0 +1,22 @@
+{
+	"customizationSuffix": "Mobile Demo 0.1",
+	"themes": [
+		{
+			"name": "mobile",
+			"title": "Mobile Demo",
+			"uses": ["platform/mobile", "colors/mobile", "common"],
+			"conditions":["isMobile"]
+		},
+		{
+			"name": "default",
+			"title": "MobDemo Browser",
+			"uses": ["platform/browser", "platform/desktop", "common"],
+			"conditions":["isBrowser","isDesktop"]
+		},
+		{
+			"name": "default_ur",
+			"title": "MobDemo UR",
+			"uses": ["platform/ur", "colors/ur"]
+		}
+	]
+}

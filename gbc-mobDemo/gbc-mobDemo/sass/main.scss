@@ -1,0 +1,206 @@
+
+BODY {
+	-webkit-font-smoothing: antialiased;
+	font-weight: $theme-font-weight;
+  margin: 0px 0px 0px 0px;
+  background: black;
+}
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url("../../resources/fonts/MaterialIcons-Regular.ttf") format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+// get rid of ugly empty folder nav butons
+.mt-tab-titles-bar .mt-tab-previous, .mt-tab-titles-bar .mt-tab-next{ 
+	width: 1px; 
+}
+
+// get rid of ugly empty toolbar nav butons
+.gbc_ToolBarWidget .mt-tab-previous, .gbc_ToolBarWidget .mt-tab-next {
+	width: 20px; 
+	&.vanished { 
+		width: 1px; 
+	}
+}
+
+// get rid of bookmarks option
+.gbc_ChromeBarItemBookmarkWidget, .gbc_ApplicationHostMenuBookmarkWidget {
+	display: none !important;
+}
+
+// remove the extra padding infront of the window title
+.gbc_ChromeBarWidget.mt-toolbar .mt-toolbar-title {
+	padding-left: 2px;
+}
+
+// Make the icons a bit bigger.
+.gbc_ChromeBarWidget .gbc_ChromeBarItemWidget .gbc_imageContainer .gbc_ImageWidget.gbc_fixedSvg > svg {
+	height: 32px;
+	width: 32px;
+}
+
+// remove the useless hamburger menu icon
+.mt-sidebar-toggle {
+	display: none;
+	width: 0px;
+}
+
+// remove the box shadows from fields.
+.mt-field {
+	outline: none;
+	border-radius: 0; //6px;
+	border-top: 1px solid $bms-button-border-color;
+	border-right: 1px solid $bms-button-border-color;
+	border-bottom: 1px solid $bms-button-border-color;
+	border-left: 1px solid $bms-button-border-color;
+	box-shadow: none;	
+}
+.mt-field.gbc_Focus {
+	outline: none;
+	border-radius: 0; //6px;
+	border-top: 1px solid $bms-button-border-color;
+	border-right: 1px solid $bms-button-border-color;
+	border-bottom: 3px solid $bms-button-border-color;
+	border-left: 1px solid $bms-button-border-color;
+	box-shadow: none;
+}
+// fix problem with border of field element of a combobox removing the top border.
+[__ComboBoxWidget] .gbc_EditWidget.mt-field {
+	border: inherit;
+}
+
+.mt-button {
+	border-radius: 0; //6px;
+	border: none; //1px solid $bms-button-border-color;
+	box-shadow: none; //3px 3px 3px 0 rgba(0, 0, 0, 0.34);
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	background-color: transparent;
+	color: inherit;
+//	background-color: #2ec2b6;
+//	background-image: radial-gradient($mt-button-primary-emphasis-background-color, $mt-button-primary-background-color);
+}
+
+[__ButtonWidget].mt-button .textimage > .gbc_imageContainer.gbc_autoScale {
+	height: auto;
+}
+
+//[__ButtonWidget].mt-button .textimage > .gbc_imageContainer .gbc_ImageWidget {
+//	fill: none;
+//}
+//[__ButtonWidget].mt-button .textimage > .gbc_imageContainer > .gbc_ImageWidget {
+//	fill: none;
+//}
+
+.gbc_ButtonWidget.gbc_Focus > .mt-button {
+	background-color: #eeeeff;
+}
+
+.mt-button.disabled:not([interruptable-active]), .gbc_MenuWidget.disabled:not([interruptable-active]) .gbc_ButtonWidget .mt-button, .mt-button.disabled:not([interruptable-active]):focus, .gbc_MenuWidget.disabled:not([interruptable-active]) .gbc_ButtonWidget .mt-button:focus {
+	background-color: $mt-white;
+//	color: black;
+	opacity: .5;	
+}
+
+.mt-button:not(.disabled):hover, .mt-button[interruptable][interruptable-active]:hover {
+	background-color: transparent;
+}
+
+// default icons to be much bigger
+.gbc_ImageWidget.gbc_fixedSvg > svg {
+	height: 48px;
+	width: 48px;
+	margin: 0px
+}
+
+// Change the default dialog boxes
+.gbc_ModalMenuDialog > .mt-dialog-pane {
+	padding: 12px;
+}
+.mt-dialog-header {
+	color: black;
+	font-size: 20pt;
+	.gbc_ImageWidget.gbc_fixedSvg > svg {
+		height: 32px;
+		width: 32px;
+		margin: 0px
+	}
+}
+.mt-dialog-content {
+	color: $bms-dark-grey;
+	font-size: 16pt;
+}
+.mt-dialog-footer {
+	color: $bms-primary;
+	font-size: 14pt;
+	font-weight: 500;
+	margin-left: auto;
+}
+.gbc_ButtonWidget.gbc_Focus > .mt-button {
+	background-color: inherit;
+	text-decoration: underline;
+}
+
+.mt-progress{
+	border: 1px solid $bms-button-border-color;
+	padding: 1px;
+	margin: 2px
+}
+
+.gbc_GroupWidgetContainer {
+	box-shadow: none; //1px 1px 6px rgba(0, 0, 0, 0.4);
+	border-radius: 6px;
+}
+.gbc_GroupWidgetContent {
+	padding: 12px;
+}
+.gbc_GroupWidget {
+	border-radius: 6px;
+}
+
+.zmdi-calendar-blank:before {
+	content: "\F0ED";
+}
+
+.gbc_ListViewRowWidget.currentRow {
+	background-color: $mt-button-primary-emphasis-background-color;
+}
+
+.gbc_ListViewRowWidget > .gbc_ListViewRowImage > .gbc_ImageWidget {
+	padding: 4.8px 0px;
+}
+
+// Fix problem with checkbox text alignment
+.gbc_CheckBoxWidget .label, .gbc_ThreeStateCheckBoxWidget .label {
+	display: contents;
+}
+
+.force_center {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}

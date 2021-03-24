@@ -1,0 +1,41 @@
+{
+	"mt-blue-grey": "#232323",
+	"palette-primary": "$mt-blue-grey",
+	"palette-text-primary": "$mt-black",
+
+	"theme-primary-color": "$mt-white",
+	"theme-primary-emphasis-background-color": "$palette-primary-800",
+	"theme-primary-faded-background-color": "$palette-primary-800",
+
+	"palette-secondary": "$mt-black",
+	"palette-text-secondary": "$mt-grey",
+
+	"theme-secondary-color": "$mt-white",
+	"theme-secondary-faded-color": "$palette-secondary-200",
+	"theme-secondary-background-color": "$palette-secondary-400",
+	"theme-secondary-alternative-background-color": "$palette-secondary-300",
+
+	"theme-header-color": "$palette-primary-900",
+	"theme-separator-color": "$palette-secondary-800",
+
+	"theme-field-background-color": "$mt-black-600",
+	"theme-field-disabled-background-color": "$mt-black-200",
+
+  "mt-field-border-color": "$theme-secondary-faded-color",
+
+	"gbc-TableWidget-unfocused-currentRow-background-color": "$theme-header-color",
+	"theme-currentrow-background-color": "$mt-light-blue-400",
+	"theme-currentrow-color": "$theme-secondary-color",
+	
+	"mt-field-border-color": "$theme-primary-background-color",
+	
+	"mt-button-margin-ratio": ".25",
+	"mt-button-primary-emphasis-background-color": "$palette-secondary-300",
+	"mt-button-primary-background-color": "$palette-secondary-200",
+	"mt-button-primary-color": "$palette-text-secondary",
+	
+	"gbc-ButtonWidget-color": "$palette-text-secondary",
+	"njm-button-border-color": "$palette-primary-200",
+	"mt-progress-background-color": "$mt-black"
+
+}

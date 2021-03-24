@@ -37,6 +37,8 @@
 *.apk
 *.gar
 *.zip
+*.tok
+*.lst
 
 # Other
 .directory
