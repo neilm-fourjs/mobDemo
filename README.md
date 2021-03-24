@@ -15,3 +15,6 @@ Mobile application that get a url from a web service, then runs the application 
 ### wsMdAppSrv
 
 Web Service that runs on a single server and tell the mobile runOnServer program which server to connect to.
+
+## Screenshots
+![ss1](https://github.com/neilm-fourjs/mobDemo/raw/master/Screenshot_MobDemo.jpg "SS1")
