@@ -135,17 +135,17 @@
       <DynamicProperty name="gma-navigationBarBackground-color" value="#084267"/>
       <DynamicProperty name="gma-primary-color" value="#084267"/>
       <DynamicProperty name="gma-primary-dark-color" value="#084267"/>
-      <DynamicProperty name="icon-hdpi" value="$(ProjectDir)/pics/bmslogo55.png"/>
-      <DynamicProperty name="icon-ldpi" value="$(ProjectDir)/pics/bmslogo36.png"/>
-      <DynamicProperty name="icon-mdpi" value="$(ProjectDir)/pics/bmslogo48.png"/>
-      <DynamicProperty name="icon-xhdpi" value="$(ProjectDir)/pics/bmslogo96.png"/>
-      <DynamicProperty name="icon-xxhdpi" value="$(ProjectDir)/pics/bmslogo144.png"/>
+      <DynamicProperty name="icon-hdpi" value="$(ProjectDir)/pics/mdlogo55.png"/>
+      <DynamicProperty name="icon-ldpi" value="$(ProjectDir)/pics/mdlogo36.png"/>
+      <DynamicProperty name="icon-mdpi" value="$(ProjectDir)/pics/mdlogo48.png"/>
+      <DynamicProperty name="icon-xhdpi" value="$(ProjectDir)/pics/mdlogo96.png"/>
+      <DynamicProperty name="icon-xxhdpi" value="$(ProjectDir)/pics/mdlogo144.png"/>
       <DynamicProperty name="packageId" value="com.fourjs.md"/>
       <DynamicProperty name="packageLabel" value="MobDemo"/>
       <DynamicProperty name="permissions" value="ACCESS_BACKGROUND_LOCATION;ACCESS_COARSE_LOCATION;ACCESS_FINE_LOCATION;ACCESS_LOCATION_EXTRA_COMMANDS;ACCESS_MEDIA_LOCATION;ACCESS_NETWORK_STATE;ACCESS_WIFI_STATE;CAMERA;CHANGE_NETWORK_STATE;INSTALL_SHORTCUT;INTERNET;LOCATION_HARDWARE;MEDIA_CONTENT_CONTROL;MOUNT_FORMAT_FILESYSTEMS;READ_EXTERNAL_STORAGE;READ_LOGS;READ_PHONE_STATE;READ_PRIVILEGED_PHONE_STATE;WRITE_EXTERNAL_STORAGE"/>
-      <DynamicProperty name="status-icon-hdpi" value="$(ProjectDir)/pics/bmslogo36.png"/>
-      <DynamicProperty name="status-icon-mdpi" value="$(ProjectDir)/pics/bmslogo24.png"/>
-      <DynamicProperty name="status-icon-xhdpi" value="$(ProjectDir)/pics/bmslogo48.png"/>
+      <DynamicProperty name="status-icon-hdpi" value="$(ProjectDir)/pics/mdlogo36.png"/>
+      <DynamicProperty name="status-icon-mdpi" value="$(ProjectDir)/pics/mdlogo24.png"/>
+      <DynamicProperty name="status-icon-xhdpi" value="$(ProjectDir)/pics/mdlogo48.png"/>
       <Directory description="Binaries" excludedFiles="Test.42r" includedFiles="*.42?,ClientCAList.pem" label="Binaries" recursive="false" sourceDirectory="$(ProjectDir)/gmbin"/>
       <Directory description="Configuration Files" includedFiles="fglprofile" label="Config" recursive="false" sourceDirectory="$(ProjectDir)/gmetc"/>
       <Directory description="Images" includedFiles="*.png,*.jpg,*.ttf,image2font.txt" label="Images" sourceDirectory="$(ProjectDir)/images"/>

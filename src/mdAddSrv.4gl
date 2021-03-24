@@ -28,9 +28,11 @@ MAIN
 			BEFORE FIELD api
 				CALL DIALOG.setActionActive("accept", FALSE)
 				CALL DIALOG.setActionActive("delete", FALSE)
+
 			AFTER FIELD api
 				LET l_api = l_rec.api
 				CALL mdsrv.v1_getList(l_rec.api) RETURNING l_ret, l_list
+				IF l_list.getLength() = 0 THEN LET l_list[1] = "any" END IF
 				CALL popup_combo(ui.ComboBox.forName("formonly.ip"), l_list)
 
 				CALL mdsrv.v1_getURL(l_rec.api) RETURNING l_ret, l_rec.*
@@ -40,6 +42,7 @@ MAIN
 					CALL fgldialog.fgl_winMessage(
 							"Result", SFMT("get returned: %1\nMessage: %2", l_ret, mdsrv.myNotFound.message), "information")
 					LET l_rec.api = l_api
+					CALL DIALOG.setActionActive("accept", TRUE)
 				ELSE
 					CALL DIALOG.setActionActive("delete", TRUE)
 					CALL DIALOG.setActionActive("accept", TRUE)
