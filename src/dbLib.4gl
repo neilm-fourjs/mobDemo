@@ -14,6 +14,7 @@ CONSTANT C_IMGEXT = "jpg"
 
 -- uncomment to disable update/delete from database.
 &define NOUPD 1
+&define DUMPDATA 1
 &define OPTIMIZE1
 
 PUBLIC TYPE t_listData1 RECORD
@@ -954,8 +955,17 @@ FUNCTION taskCursor(l_rows SMALLINT, l_age SMALLINT, l_branch CHAR(2)) RETURNS S
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION getTaskData(
-		l_branch CHAR(2), l_emp CHAR(4), l_rows SMALLINT, l_age SMALLINT, l_delivery INTEGER, l_collection INTEGER)
+		l_branch CHAR(2), l_emp CHAR(4), l_rows SMALLINT, l_age SMALLINT, l_delivery INTEGER, l_collection INTEGER) RETURNS( DYNAMIC ARRAY OF t_listData1 )
 	DEFINE l_q1 STRING
+	DEFINE l_data STRING
+	DEFINE l_arr       DYNAMIC ARRAY OF t_listData1
+
+	LET l_data = getData("getTasks_"||l_emp||".json")
+	IF l_data IS NOT NULL THEN
+		CALL util.JSON.parse(l_data, l_arr)
+		RETURN l_arr
+	END IF
+
 	DEBUG(2, SFMT("getTaskData: Br:%1 E:%2 R:%3 A:%4 D:%5 C:%6", l_branch, l_emp, l_rows, l_age, l_delivery, l_collection))
 	LET l_q1 = taskCursor(l_rows: l_rows, l_age: l_age, l_branch: l_branch)
 --	LET l_q1 = "SELECT 'jn', job_link FROM next_job WHERE employee = '",l_emp,"' AND branch = '",l_branch,"' ORDER BY job_link"
@@ -965,7 +975,7 @@ FUNCTION getTaskData(
 	RETURN getTasks(l_emp: l_emp, l_collection: l_collection, l_delivery: l_delivery)
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS DYNAMIC ARRAY OF t_listData1
+FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS( DYNAMIC ARRAY OF t_listData1 )
 	DEFINE l_job01     RECORD LIKE job01.*
 	DEFINE l_job_dates RECORD LIKE job_dates.*
 	DEFINE l_vehicle   RECORD LIKE vehicle.*
@@ -977,7 +987,6 @@ FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS DYNAM
 	DEFINE l_rec       t_listData1
 	DEFINE l_arr       DYNAMIC ARRAY OF t_listData1
 	DEFINE x           INTEGER
-	DEFINE l_dump      TEXT
 	DEFINE l_jobs      INTEGER = 1
 	DEFINE l_tasks     INTEGER = 0
 	DEFINE l_gotList   BOOLEAN
@@ -1123,11 +1132,10 @@ FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS DYNAM
 		DEBUG(3, SFMT("%1 %2(%3) WC: %4 Cmd: %5 NJ: %6 T1: %7 T2: %8  PS: %9 Emp: %10 Srt: %11", l_arr[x].branch_code, l_arr[x].job_number, l_arr[x].job_link, l_arr[x].work_code, l_arr[x].trim_cmd, l_arr[x].in_next_job, l_arr[x].in_trim1, l_arr[x].in_trim2, (l_arr[x].list_status USING "&&#"), l_arr[x].emp_code, l_arr[x].started))
 	END FOR
 
-	IF m_debug > 3 THEN
-		--DEBUG: dump task list to a JSON file for debug only.
-		LOCATE l_dump IN FILE "data.json"
-		LET l_dump = util.json.stringify(l_arr)
-	END IF
+&ifdef DUMPDATA
+	CALL dumpData(  "getTasks_"||l_emp||".json", util.json.stringify(l_arr) )
+&endif
+
 	RETURN l_arr
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1138,6 +1146,9 @@ FUNCTION timeRemaining(l_rec t_listData1) RETURNS DECIMAL(6, 2)
 	DEFINE l_htime_dec DECIMAL(6, 2)
 	DEFINE l_remaining DECIMAL(6, 2)
 	DEFINE l_lista     RECORD LIKE lista.*
+&ifdef NOUPD
+	RETURN 1.2
+&endif
 -- Get the current lista details.
 	SELECT * INTO l_lista.* FROM lista
 			WHERE job_link = l_rec.job_link AND lista.entry_no = 0 AND lista.list_link = l_rec.list_link
@@ -1304,6 +1315,13 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 	DEFINE l_list_title    LIKE lists.list_title
 	DEFINE x               SMALLINT = 0
 	DEFINE l_status        STRING
+	DEFINE l_data STRING
+
+	LET l_data = getData("getPartsForJob_"||l_job_link||".json")
+	IF l_data IS NOT NULL THEN
+		CALL util.JSON.parse(l_data, l_arr)
+		RETURN l_arr
+	END IF
 
 	DECLARE c_get_parts_enq CURSOR FOR
 			SELECT parts.*, list_title FROM parts, lists
@@ -1378,7 +1396,9 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 
 	END FOREACH
 	DEBUG(2, SFMT("getPartsForJob: JL: %1 Rows: %2", l_job_link, l_arr.getLength()))
-
+&ifdef DUMPDATA
+	CALL dumpData(  "getPartsForJob_"||l_job_link||".json", util.json.stringify(l_arr) )
+&endif
 	RETURN l_arr
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1401,6 +1421,13 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 	DEFINE l_overrun     DECIMAL(9, 2)
 	DEFINE l_worked_time DECIMAL(9, 2)
 	DEFINE l_interval    INTERVAL DAY(3) TO SECOND
+	DEFINE l_data STRING
+
+	LET l_data = getData("getTasksForJob_"||l_job_link||".json")
+	IF l_data IS NOT NULL THEN
+		CALL util.JSON.parse(l_data, l_arr)
+		RETURN l_arr
+	END IF
 
 	LET l_overrun = 0
 	IF l_overrun IS NULL OR l_overrun < 1 THEN
@@ -1485,7 +1512,9 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 }
 		DEBUG(3, SFMT("getTasksForJob JL: %1, %2 Titl: %3 img: %4 WH: %5 AH: %6 OV: %7 ST: %8", l_job_link, x, l_lists_rec.job_sheet_title, l_arr[x].line_img, l_lista_rec.workshop_hours, l_lista_rec.actual_hours, l_overrun_b, l_st))
 	END FOREACH
-
+&ifdef DUMPDATA
+	CALL dumpData( "getTasksForJob_"||l_job_link||".json", util.json.stringify(l_arr) )
+&endif
 	RETURN l_arr
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1564,6 +1593,9 @@ FUNCTION isClockedOn(l_empCode LIKE trim1.employee_code, l_branch LIKE trim1.bra
 	DEFINE l_count SMALLINT
 	DEFINE l_dt    LIKE trim1.swipe_time
 	DEBUG(2, SFMT("isClockedOn: %1 %2 ...", l_empCode, l_branch))
+&ifdef NOUPD
+	RETURN TRUE, CURRENT
+&endif
 	SELECT COUNT(*) INTO l_count FROM trim1
 			WHERE trim1.employee_code = l_empCode AND trim1.branch_code = l_branch AND trim1.work_code = "__ON"
 					AND trim1.command_code = "X"
@@ -1573,6 +1605,7 @@ FUNCTION isClockedOn(l_empCode LIKE trim1.employee_code, l_branch LIKE trim1.bra
 						AND trim1.command_code = "X"
 	END IF
 	DEBUG(2, SFMT("isClockedOn: %1 %2 %3", l_empCode, l_branch, l_count))
+
 	RETURN (l_count > 0), l_dt
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
@@ -1686,6 +1719,27 @@ FUNCTION runProg(l_prog STRING, l_args STRING) RETURNS SMALLINT
 	DEBUG(3, SFMT("runProg: Returned %1 %2", l_ret, l_result))
 
 	RETURN l_ret
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
+FUNCTION getData(l_file STRING) RETURNS (STRING)
+	DEFINE l_dump TEXT
+		--DEBUG: dump task list to a JSON file for debug only.
+	IF os.path.exists(l_file) THEN
+		LOCATE l_dump IN FILE l_file
+		DISPLAY "Using: ",l_file
+	ELSE
+		RETURN NULL
+	END IF
+	RETURN l_dump
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
+FUNCTION dumpData(l_file STRING, l_data STRING)
+	DEFINE l_dump TEXT
+		--DEBUG: dump task list to a JSON file for debug only.
+	IF NOT os.path.exists(l_file) THEN
+		LOCATE l_dump IN FILE l_file
+		LET l_dump = l_data
+	END IF
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Error handler

@@ -106,7 +106,7 @@
     <Package binaryName="mobDemo" dependencies="18736,14000,1654888050,-1945596152,-935670530,-635579031,1069724520,1986,-1263058085,1734926700,1938266160,-1304862792" description="mdMobile" id="-721681976" label="mobDemo" platform="Genero Application Server">
       <DynamicProperty name="packageId" value="mdMobile"/>
       <DynamicProperty name="packageLabel" value="mdMobile"/>
-      <Directory excludedFiles="Test.42r" includedFiles="*.42?,*.sh" label="Binaries" sourceDirectory="$(ProjectDir)/bin"/>
+      <Directory excludedFiles="Test.42r" includedFiles="*.42?,*.sh,*.json" label="Binaries" sourceDirectory="$(ProjectDir)/bin"/>
       <Directory includedFiles="mdProfile" label="Config" recursive="false" sourceDirectory="$(ProjectDir)/etc"/>
       <Directory includedFiles="*.42?" label="GMBin" sourceDirectory="$(ProjectDir)/gmbin"/>
       <Directory label="Images" sourceDirectory="$(ProjectDir)/pics"/>
