@@ -9,7 +9,7 @@ SCHEMA bsdb
 
 &define DEBUG( l_lev, l_msg ) IF this.mobLib.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
 
-CONSTANT C_DEFIMG     = "logo55.png"
+CONSTANT C_DEFIMG     = "nouserimg.png"
 CONSTANT C_LOCKOUT    = "Your account is currently locked out! - Please contact the office."
 CONSTANT C_HOURSCHECK = "Not Available for following reason:\n%1\nPlease contact the office."
 
@@ -51,7 +51,7 @@ FUNCTION (this mdUsers) login(l_titl STRING, l_info STRING) RETURNS BOOLEAN
 	OPEN FORM login FROM this.mobLib.openForm("mdLogin")
 	DISPLAY FORM login
 	DISPLAY l_titl TO titl
-	IF l_info IS NOT NULL THEN
+	IF l_info.getLength() > 2 THEN
 		CALL ui.Window.getCurrent().getForm().setFieldHidden("formonly.info", FALSE)
 		DISPLAY l_info TO info
 	END IF

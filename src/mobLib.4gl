@@ -175,6 +175,7 @@ FUNCTION (this mobLib) init(l_app STRING) RETURNS(mobLib)
 			DEBUG(2, SFMT("Arg: %1 = %2", x, ARG_VAL(x)))
 		END FOR
 	END IF
+	DEBUG(0, SFMT("CFG Path: '%1'", this.cfg.cfgPath))
 
 	IF NUM_ARGS() = 0 THEN
 		DEBUG(0, SFMT("WARNING: using default database '%1'", this.dbName))
@@ -214,10 +215,8 @@ FUNCTION (this mobLib) getConfig() RETURNS()
 	DEFINE l_json TEXT
 	DEFINE l_read BOOLEAN
 	DEFINE l_jo   util.JSONObject
---	DEFINE l_cfg mobLibCFG
 
 	LET l_file = os.path.join(this.cfg.cfgPath, this.appName.trim() || ".cfg")
-	DISPLAY "MD CFG:", l_file
 	LET l_read = os.path.exists(l_file)
 	LOCATE l_json IN FILE l_file
 	IF l_read THEN            -- read the config and override the defaults
@@ -232,9 +231,12 @@ FUNCTION (this mobLib) getConfig() RETURNS()
 --		ELSE -- use the cfg from the json file
 --			LET this.cfg = l_cfg
 		END IF
+-- can't use debug here because log path is not setup correctly yet!!
+		DISPLAY SFMT("%1:0:%2:%3:CFG Read: %4", CURRENT, __LINE__ USING "####&", "mobLib.4gl", l_file)
 	ELSE
 		-- save the config with the default values
 		LET l_json = util.JSON.stringify(this.cfg)
+		DISPLAY SFMT("%1:0:%2:%3:CFG Written: %4", CURRENT, __LINE__ USING "####&", "mobLib.4gl", l_file)
 	END IF
 
 END FUNCTION

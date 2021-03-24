@@ -96,13 +96,13 @@ FUNCTION debugOut(l_lev SMALLINT, l_mod STRING, l_lineno SMALLINT, l_msg STRING)
 		LET l_dte = util.Datetime.format(CURRENT, "%Y%m%d_%H%M%S")
 		LET m_debugFile =
 				os.path.join(m_logPath, base.Application.getProgramName() || "_" || l_dte || "." || fgl_getPid() || ".log")
-		DISPLAY CURRENT, ":DebugLog:", m_debugFile
+		DISPLAY SFMT("%1:0:%2:%3:LOG: %4", CURRENT, __LINE__ USING "####&", "stdLib.4gl", NVL(m_debugFile, "NULL"))
 	END IF
 	IF l_lev > m_debug THEN
 		RETURN
 	END IF
 	LET l_mod  = os.path.baseName(l_mod)
-	LET l_line = CURRENT, ":", l_lev USING "&", ":", l_lineno USING "####&", ":", l_mod, ":", NVL(l_msg, "NULL")
+	LET l_line = SFMT("%1:%2:%3:%4:%5", CURRENT, l_lev USING "&", l_lineno USING "####&", l_mod, NVL(l_msg, "NULL"))
 	DISPLAY l_line
 	LET c = base.Channel.create()
 	CALL c.openFile(m_debugFile, "a+")

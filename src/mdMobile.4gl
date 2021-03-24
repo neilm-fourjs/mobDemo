@@ -59,10 +59,9 @@ MAIN
 	OPEN FORM menu FROM l_menuForm
 
 	IF fgl_getEnv("SHOWINFO") = 1 THEN
-		LET l_info =
-				SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",
-						'<i class="material-icons">clean_hands</i>', '<i class="material-icons">coronavirus</i>')
-		DISPLAY "Info: ", l_info
+		LET l_info = dbLib.getMOD()
+				{SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",
+						'<i class="material-icons">clean_hands</i>', '<i class="material-icons">coronavirus</i>')}
 	END IF
 	WHILE TRUE
 		LET m_mobLib.emp_code = NULL

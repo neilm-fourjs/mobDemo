@@ -955,12 +955,13 @@ FUNCTION taskCursor(l_rows SMALLINT, l_age SMALLINT, l_branch CHAR(2)) RETURNS S
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION getTaskData(
-		l_branch CHAR(2), l_emp CHAR(4), l_rows SMALLINT, l_age SMALLINT, l_delivery INTEGER, l_collection INTEGER) RETURNS( DYNAMIC ARRAY OF t_listData1 )
-	DEFINE l_q1 STRING
+		l_branch CHAR(2), l_emp CHAR(4), l_rows SMALLINT, l_age SMALLINT, l_delivery INTEGER, l_collection INTEGER)
+		RETURNS(DYNAMIC ARRAY OF t_listData1)
+	DEFINE l_q1   STRING
 	DEFINE l_data STRING
-	DEFINE l_arr       DYNAMIC ARRAY OF t_listData1
+	DEFINE l_arr  DYNAMIC ARRAY OF t_listData1
 
-	LET l_data = getData("getTasks_"||l_emp||".json")
+	LET l_data = getData("getTasks_" || l_emp || ".json")
 	IF l_data IS NOT NULL THEN
 		CALL util.JSON.parse(l_data, l_arr)
 		RETURN l_arr
@@ -975,7 +976,7 @@ FUNCTION getTaskData(
 	RETURN getTasks(l_emp: l_emp, l_collection: l_collection, l_delivery: l_delivery)
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS( DYNAMIC ARRAY OF t_listData1 )
+FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS(DYNAMIC ARRAY OF t_listData1)
 	DEFINE l_job01     RECORD LIKE job01.*
 	DEFINE l_job_dates RECORD LIKE job_dates.*
 	DEFINE l_vehicle   RECORD LIKE vehicle.*
@@ -1133,7 +1134,7 @@ FUNCTION getTasks(l_emp CHAR(4), l_collection INT, l_delivery INT) RETURNS( DYNA
 	END FOR
 
 &ifdef DUMPDATA
-	CALL dumpData(  "getTasks_"||l_emp||".json", util.json.stringify(l_arr) )
+	CALL dumpData("getTasks_" || l_emp || ".json", util.json.stringify(l_arr))
 &endif
 
 	RETURN l_arr
@@ -1315,9 +1316,9 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 	DEFINE l_list_title    LIKE lists.list_title
 	DEFINE x               SMALLINT = 0
 	DEFINE l_status        STRING
-	DEFINE l_data STRING
+	DEFINE l_data          STRING
 
-	LET l_data = getData("getPartsForJob_"||l_job_link||".json")
+	LET l_data = getData("getPartsForJob_" || l_job_link || ".json")
 	IF l_data IS NOT NULL THEN
 		CALL util.JSON.parse(l_data, l_arr)
 		RETURN l_arr
@@ -1397,7 +1398,7 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 	END FOREACH
 	DEBUG(2, SFMT("getPartsForJob: JL: %1 Rows: %2", l_job_link, l_arr.getLength()))
 &ifdef DUMPDATA
-	CALL dumpData(  "getPartsForJob_"||l_job_link||".json", util.json.stringify(l_arr) )
+	CALL dumpData("getPartsForJob_" || l_job_link || ".json", util.json.stringify(l_arr))
 &endif
 	RETURN l_arr
 END FUNCTION
@@ -1421,9 +1422,9 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 	DEFINE l_overrun     DECIMAL(9, 2)
 	DEFINE l_worked_time DECIMAL(9, 2)
 	DEFINE l_interval    INTERVAL DAY(3) TO SECOND
-	DEFINE l_data STRING
+	DEFINE l_data        STRING
 
-	LET l_data = getData("getTasksForJob_"||l_job_link||".json")
+	LET l_data = getData("getTasksForJob_" || l_job_link || ".json")
 	IF l_data IS NOT NULL THEN
 		CALL util.JSON.parse(l_data, l_arr)
 		RETURN l_arr
@@ -1513,7 +1514,7 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 		DEBUG(3, SFMT("getTasksForJob JL: %1, %2 Titl: %3 img: %4 WH: %5 AH: %6 OV: %7 ST: %8", l_job_link, x, l_lists_rec.job_sheet_title, l_arr[x].line_img, l_lista_rec.workshop_hours, l_lista_rec.actual_hours, l_overrun_b, l_st))
 	END FOREACH
 &ifdef DUMPDATA
-	CALL dumpData( "getTasksForJob_"||l_job_link||".json", util.json.stringify(l_arr) )
+	CALL dumpData("getTasksForJob_" || l_job_link || ".json", util.json.stringify(l_arr))
 &endif
 	RETURN l_arr
 END FUNCTION
@@ -1721,12 +1722,26 @@ FUNCTION runProg(l_prog STRING, l_args STRING) RETURNS SMALLINT
 	RETURN l_ret
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION getData(l_file STRING) RETURNS (STRING)
+-- Get Message of the Day
+FUNCTION getMOD() RETURNS STRING
+	DEFINE l_file STRING
+	DEFINE l_txt  TEXT
+	LET l_file = os.path.join(m_db_mobLib.cfg.cfgPath, "mod.txt")
+	IF NOT os.path.exists(l_file) THEN
+		DEBUG(1, SFMT("No Message of the Day file: %1", l_file))
+		RETURN NULL
+	END IF
+	LOCATE l_txt IN FILE l_file
+	DEBUG(1, SFMT("Message of the Day file: %1\nMOD: %2", l_file, l_txt))
+	RETURN l_txt
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
+FUNCTION getData(l_file STRING) RETURNS(STRING)
 	DEFINE l_dump TEXT
-		--DEBUG: dump task list to a JSON file for debug only.
+	--DEBUG: dump task list to a JSON file for debug only.
 	IF os.path.exists(l_file) THEN
 		LOCATE l_dump IN FILE l_file
-		DISPLAY "Using: ",l_file
+		DISPLAY "Using: ", l_file
 	ELSE
 		RETURN NULL
 	END IF
@@ -1735,7 +1750,7 @@ END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION dumpData(l_file STRING, l_data STRING)
 	DEFINE l_dump TEXT
-		--DEBUG: dump task list to a JSON file for debug only.
+	--DEBUG: dump task list to a JSON file for debug only.
 	IF NOT os.path.exists(l_file) THEN
 		LOCATE l_dump IN FILE l_file
 		LET l_dump = l_data
