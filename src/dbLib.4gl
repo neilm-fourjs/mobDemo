@@ -104,7 +104,7 @@ FUNCTION checkTable(l_tab STRING) RETURNS BOOLEAN
 		CASE l_tab
 			WHEN "mobdemoreg"
 				LET l_str =
-						"CREATE TABLE mobdemoreg( app_name VARCHAR(20), dev_id VARCHAR(30), ip VARCHAR(80), cono CHAR(4),user_id CHAR(10), when_ts DATETIME YEAR TO SECOND)"
+						"CREATE TABLE mobdemoreg( app_name VARCHAR(20), dev_id VARCHAR(50), ip VARCHAR(80), cono CHAR(4),user_id CHAR(10), when_ts DATETIME YEAR TO SECOND)"
 			OTHERWISE
 				RETURN FALSE
 		END CASE

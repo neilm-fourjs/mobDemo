@@ -94,14 +94,18 @@ FUNCTION deviceRegister(l_mobLib mobLib INOUT) RETURNS BOOLEAN
 	DISPLAY FORM mobRegistered
 	DISPLAY "Application Registration" TO titl
 
-	CALL stdLib.warning(SFMT("Device not registared\nApplication:'%1'", l_mobLib.appName), TRUE)
+	--CALL stdLib.warning(SFMT("Device not registared\nApplication:'%1'", l_mobLib.appName), TRUE)
 
+	LET l_mobLib.user_id = "test"
+	LET l_pwd = "test"
 	LET l_mobLib.reg.regVersion = C_REGVER
 	INPUT BY NAME l_mobLib.reg.dev_id2, l_mobLib.reg.cono, l_mobLib.user_id, l_pwd WITHOUT DEFAULTS
 		BEFORE INPUT
 			IF l_mobLib.reg.cono IS NOT NULL THEN
 				CALL DIALOG.setFieldActive("cono", FALSE)
 			END IF
+			EXIT INPUT -- Auto register for demo
+
 		BEFORE FIELD cono
 			DISPLAY "Please enter a valid company number." TO formhelp
 
