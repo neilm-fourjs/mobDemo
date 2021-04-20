@@ -4,15 +4,15 @@ GBCBASE=$(PWD)
 include makefile.inc
 
 BASE=$(shell pwd)
-dirs=gbc-mobDemo
+dirs=$(shell find . -maxdepth 1 -type d -name gbc-\*)
 
-all: distbin gbc-current subdirs
+all: distbin gbc-current$(GENVER) subdirs
 
 distbin:
 	mkdir distbin
 
 # Setup the GBC build env
-gbc-current: 
+gbc-current$(GENVER): 
 	./gbc-setup.sh > gbc-setup.out
 
 subdirs: $(dirs)
