@@ -1,0 +1,8 @@
+<div style="display: inline-flex; margin-top: 10px;">
+<i class="material-icons" style="font-size: 30px;">coronavirus&nbsp</i>
+<div style="font-size: 26px;margin-bottom: 10px">Be </div>
+<i class="material-icons" style="font-size: 30px;">6_ft_apart </i>
+<div style="font-size: 26px;margin-bottom: 10px"> Ware </div>
+<i class="material-icons" style="font-size: 30px;">masks</i>
+<i class="material-icons" style="font-size: 30px;">&nbsp;coronavirus</i>
+</div>
