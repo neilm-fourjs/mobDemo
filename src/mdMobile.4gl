@@ -103,17 +103,26 @@ FUNCTION mainMenu() RETURNS()
 		--LET l_ret = m_menu.itemActive("wip", FALSE)
 		LET l_ret = m_menu.itemActive("jobs", FALSE)
 		LET l_ret = m_menu.itemActive("search", FALSE)
+		LET l_ret = m_menu.itemActive("misctask", FALSE)
 		IF m_user.state THEN
 			IF m_user.emp_rec.productive != "N" THEN -- unproductive emps can only clock on and clock off.
 				LET l_ret = m_menu.itemActive("curtasks", TRUE)
 				LET l_ret = m_menu.itemActive("mytasks", TRUE)
+				LET l_ret = m_menu.itemActive("misctask", TRUE)
 				--LET l_ret = m_menu.itemActive("wip", C_WIP_FEATURE)
 				LET l_ret = m_menu.itemActive("jobs", C_JOBS_FEATURE)
 				LET l_ret = m_menu.itemActive("search", C_SEARCH_FEATURE)
 			END IF
-			LET l_ret = m_menu.itemText("clockevent", "Clock Off")
+--			LET l_ret = m_menu.itemText("clockevent", "Clock Off")
+				LET l_ret = m_menu.itemState("clockevent", 2)
 		ELSE
-			LET l_ret = m_menu.itemText("clockevent", "Clock On")
+--			LET l_ret = m_menu.itemText("clockevent", "Clock On")
+				LET l_ret = m_menu.itemState("clockevent", 1)
+		END IF
+		IF m_user.onMiscTask THEN
+			LET l_ret = m_menu.itemState("misctask", 2)
+		ELSE
+			LET l_ret = m_menu.itemState("misctask", 1)
 		END IF
 		DISPLAY IIF(m_user.state, C_ICON_CLOCKEDON, C_ICON_CLOCKEDOFF) TO imgstat
 		DISPLAY IIF(m_user.state, "Clocked On", "Not Clocked On") TO status
@@ -131,8 +140,8 @@ FUNCTION mainMenu() RETURNS()
 				CALL m_tasks.showList(2, TRUE) --	View All Tasks Allocationed to Me
 			WHEN "wip"
 				CALL m_tasks.showList(3, TRUE) --	View WIP
-			WHEN "jobs"
-				CALL m_tasks.jobs("On site / WIP") -- Jobs on site / WIP
+			WHEN "misctask"
+				LET m_user.onMiscTask = NOT m_user.onMiscTask
 			WHEN "search"
 				CALL m_tasks.search() -- Search for jobs
 			WHEN "empenq"

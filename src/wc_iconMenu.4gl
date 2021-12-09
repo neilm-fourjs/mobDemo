@@ -10,11 +10,15 @@ PUBLIC TYPE wc_iconMenu RECORD
 	debug    SMALLINT,
 	menuJS RECORD
 		menu DYNAMIC ARRAY OF RECORD
-			text      STRING,
-			image     STRING,
-			imgcolour STRING,
-			action    STRING,
-			active    BOOLEAN
+			text       STRING,
+			text2      STRING,
+			image      STRING,
+			image2     STRING,
+			imgcolour  STRING,
+			imgcolour2 STRING,
+			state      SMALLINT,
+			action     STRING,
+			active     BOOLEAN
 		END RECORD
 	END RECORD,
 	fields DYNAMIC ARRAY OF RECORD
@@ -25,6 +29,7 @@ PUBLIC TYPE wc_iconMenu RECORD
 END RECORD
 
 FUNCTION (this wc_iconMenu) init(l_fileName STRING, l_useWC BOOLEAN) RETURNS BOOLEAN
+	DEFINE x SMALLINT
 	IF l_fileName IS NOT NULL THEN
 		LET this.fileName = l_fileName
 	END IF
@@ -49,10 +54,37 @@ FUNCTION (this wc_iconMenu) init(l_fileName STRING, l_useWC BOOLEAN) RETURNS BOO
 		CALL stdLib.popup("Error", "Menu array is empty!", "exclation", 0)
 		RETURN FALSE
 	END IF
+	FOR x = 1 TO this.menuJS.menu.getLength() -- default the 2nd attributes
+		IF this.menuJS.menu[x].text2 IS NULL THEN
+			LET this.menuJS.menu[x].text2 = this.menuJS.menu[x].text
+		END IF
+		IF this.menuJS.menu[x].image2 IS NULL THEN
+			LET this.menuJS.menu[x].image2 = this.menuJS.menu[x].image
+		END IF
+		IF this.menuJS.menu[x].imgcolour2 IS NULL THEN
+			LET this.menuJS.menu[x].imgcolour2 = this.menuJS.menu[x].imgcolour
+		END IF
+		IF this.menuJS.menu[x].state IS NULL THEN
+			LET this.menuJS.menu[x].state = 1
+		END IF
+	END FOR
 	--DISPLAY "Menu Items:", this.menuJS.menu.getLength()
 	LET this.fields[1].name = "formonly.l_iconmenu"
 	LET this.fields[1].type = "STRING"
 	RETURN TRUE
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
+FUNCTION (this wc_iconMenu) itemState(l_item STRING, l_state SMALLINT) RETURNS BOOLEAN
+	DEFINE x SMALLINT
+	FOR x = 1 TO this.menuJS.menu.getLength()
+		IF l_item = this.menuJS.menu[x].action THEN
+			DEBUG(4, SFMT("itemState: %1 was: %2 now: %3 ", l_item, this.menuJS.menu[x].state, l_state))
+			LET this.menuJS.menu[x].state = l_state
+			RETURN TRUE
+		END IF
+	END FOR
+	DEBUG(2, SFMT("itemState: %1 not found!", l_item))
+	RETURN FALSE
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION (this wc_iconMenu) itemActive(l_item STRING, l_active BOOLEAN) RETURNS BOOLEAN
@@ -156,12 +188,17 @@ FUNCTION (this wc_iconMenu) menu(l_timer SMALLINT, l_idle SMALLINT) RETURNS STRI
 					LET this.menuJS.menu[x].action = "opt" || x
 					CALL DIALOG.getForm().setElementHidden("opt" || x, TRUE)
 				ELSE
-					CALL DIALOG.getForm().setElementText("opt" || x, this.menuJS.menu[x].text)
-					CALL DIALOG.getForm().setElementImage("opt" || x, this.menuJS.menu[x].image)
 					IF NOT this.menuJS.menu[x].active THEN
 						CALL DIALOG.setActionActive("opt" || x, FALSE)
 					ELSE
 						CALL DIALOG.setActionActive("opt" || x, TRUE)
+					END IF
+					IF this.menuJS.menu[x].state = 1 THEN
+						CALL DIALOG.getForm().setElementText("opt" || x, this.menuJS.menu[x].text)
+						CALL DIALOG.getForm().setElementImage("opt" || x, this.menuJS.menu[x].image)
+					ELSE
+						CALL DIALOG.getForm().setElementText("opt" || x, this.menuJS.menu[x].text2)
+						CALL DIALOG.getForm().setElementImage("opt" || x, this.menuJS.menu[x].image2)
 					END IF
 				END IF
 			END FOR
@@ -224,11 +261,26 @@ FUNCTION (this wc_iconMenu) getJSfromFile(l_fileName STRING) RETURNS STRING
 	RETURN l_menu
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION (this wc_iconMenu) addMenuItem(l_text STRING, l_img STRING, l_act STRING, l_live BOOLEAN)
+FUNCTION (this wc_iconMenu) addMenuItem(
+		l_text     STRING, l_text2 STRING, l_img STRING, l_img2 STRING, l_imgcol STRING, l_imgcol2 STRING, l_act STRING,
+		l_live     BOOLEAN)
 	DEFINE x SMALLINT
-	LET x                          = this.menuJS.menu.getLength() + 1
-	LET this.menuJS.menu[x].text   = l_text
-	LET this.menuJS.menu[x].image  = l_img
-	LET this.menuJS.menu[x].action = l_act
-	LET this.menuJS.menu[x].active = l_live
+	LET x                        = this.menuJS.menu.getLength() + 1
+	LET this.menuJS.menu[x].text = l_text
+	IF l_text2 IS NULL THEN
+		LET l_text2 = l_text
+	END IF
+	IF l_img2 IS NULL THEN
+		LET l_img2 = l_img
+	END IF
+	IF l_imgcol2 IS NULL THEN
+		LET l_imgcol2 = l_imgcol
+	END IF
+	LET this.menuJS.menu[x].text2      = l_text2
+	LET this.menuJS.menu[x].image      = l_img
+	LET this.menuJS.menu[x].image2     = l_img2
+	LET this.menuJS.menu[x].imgcolour  = l_imgcol
+	LET this.menuJS.menu[x].imgcolour2 = l_imgcol2
+	LET this.menuJS.menu[x].action     = l_act
+	LET this.menuJS.menu[x].active     = l_live
 END FUNCTION

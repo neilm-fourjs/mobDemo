@@ -68,6 +68,7 @@ PUBLIC TYPE mobLib RECORD
 	dbName        STRING,
 	connected     BOOLEAN,
 	feName        STRING,
+	feVer         STRING,
 	feMobile      BOOLEAN,
 	cli_ip        STRING,
 	sysName       STRING,
@@ -182,8 +183,13 @@ FUNCTION (this mobLib) init(l_app STRING) RETURNS(mobLib)
 	END IF
 
 	LET this.regFile  = this.appName || ".reg"
+	DEBUG(1, "Doing getFrontEndName ...")
 	LET this.feName   = ui.Interface.getFrontEndName()
 	LET this.feMobile = FALSE
+	DEBUG(1, SFMT("Done getFrontEndName %1", this.feName))
+	DEBUG(1, "Doing getFrontEndVersion ...")
+	LET this.feVer   = ui.Interface.getFrontEndVErsion()
+	DEBUG(1, SFMT("Done getFrontEndVersion %1", this.feVer))
 
 -- Setup image storage on the server.
 	LET this.cfg.imgPath = os.path.join(this.cfg.fileStorage, this.cfg.imgPath)
@@ -251,7 +257,7 @@ FUNCTION (this mobLib) about()
 	END IF
 
 	LET l_url = fgl_getEnv("FGL_VMPROXY_START_URL")
-	LET l_cli = this.feName, " ", ui.Interface.getFrontEndVersion()
+	LET l_cli = this.feName, " ", this.feVer
 	LET l_gbc = ui.Interface.getUniversalClientName(), " Ver:", ui.Interface.getUniversalClientVersion()
 	IF l_gbc.getLength() > 1 THEN
 		LET l_cli = l_cli.append("\nUR: " || l_gbc)

@@ -64,7 +64,7 @@
   </Settings>
   <LanguageList version="1.0"/>
   <PlatformList version="1.0"/>
-  <Group environment="value:CONO=1234,value:GBC_USER=gbc-mobDemo,value:GBC_USER_DIR=$(FGLDIR)/web_utilities/gbc,value:FGLGBCDIR=$(GBC_USER_DIR)/$(GBC_USER),value:SHOWINFO=1,value:STYLE=1,value:ICONMENU=0,value:MDCFGPATH=mdConfig,value:MDLOGPATH=mdLogs,value:MDIMGPATH=mdImages,value:MDDOCPATH=mdDocs,value:FILESTORAGE=$(ProjectDir)/mdFiles,value:MDDEBUG=3,value:BASEDIR=$(ProjectDir),value:FGLPROFILE=../etc/mdProfile,value:USECFG=1,value:FGLIMAGEPATH=../pics:../etc:../etc/image2font.txt,value:GMASETTINGS=1" id="1306390861" label="App" language="Genero">
+  <Group environment="value:CONO=1234,value:GBC_USER=gbc-mobDemo,value:GBC_USER_DIR=$(FGLDIR)/web_utilities/gbc,value:FGLGBCDIR=$(GBC_USER_DIR)/$(GBC_USER),value:SHOWINFO=1,value:STYLE=1,value:ICONMENU=1,value:MDCFGPATH=mdConfig,value:MDLOGPATH=mdLogs,value:MDIMGPATH=mdImages,value:MDDOCPATH=mdDocs,value:FILESTORAGE=$(ProjectDir)/mdFiles,value:MDDEBUG=3,value:BASEDIR=$(ProjectDir),value:FGLPROFILE=../etc/mdProfile,value:USECFG=1,value:FGLIMAGEPATH=../pics:../etc:../etc/image2font.txt,value:GMASETTINGS=1" id="1306390861" label="App" language="Genero">
     <Library binaryName="Databases" id="1986" label="Databases">
       <File filePath="etc/bsdb.4db"/>
     </Library>

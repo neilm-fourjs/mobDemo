@@ -1,10 +1,13 @@
 {
 	"menu": [
 		{
-			"text": "Clock On/Off",
+			"text": "Clock On",
+			"text2": "Clock Off",
 			"image": "alarm_on",
+			"image2": "alarm_off",
 			"imgcolour": "#00b4a5",
 			"action": "clockevent",
+			"state": 1,
 			"active": true
 		},
 		{
@@ -12,42 +15,39 @@
 			"image": "assignment",
 			"imgcolour": "#00b4a5",
 			"action": "curtasks",
-			"active": true
+			"state": 1,
+			"active": false
 		},
 		{
 			"text": "Allocated Task(s)",
 			"image": "assignment_ind",
 			"imgcolour": "#00b4a5",
 			"action": "mytasks",
-			"active": true
-		},
-		{
-			"text": "_WIP",
-			"image": "timeline",
-			"imgcolour": "#00b4a5",
-			"action": "wip",
-			"active": false
-		},
-
-		{
-			"text": "Jobs Onsite",
-			"image": "place",
-			"action": "jobs",
-			"imgcolour": "#00b4a5",
+			"state": 1,
 			"active": false
 		},
 		{
-			"text": "Search",
+			"text": "Clock On Misc Task",
+			"text2": "Clock Off Misc Task",
+			"image": "menu",
+			"imgcolour": "#00b4a5",
+			"action": "misctask",
+			"state": 1,
+			"active": false
+		},
+		{
+			"text": "Job Search",
 			"image": "search",
 			"imgcolour": "#00b4a5",
 			"action": "search",
-			"active": true
+			"active": false
 		},
 		{
 			"text": "Employee Enquiry",
 			"image": "person_outline",
 			"imgcolour": "#00b4a5",
 			"action": "empenq",
+			"state": 1,
 			"active": true
 		},
 		{
@@ -62,6 +62,7 @@
 			"image": "power_settings_new",
 			"imgcolour": "#000000",
 			"action": "logoff",
+			"state": 1,
 			"active": true
 		}
 	]

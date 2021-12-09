@@ -49,9 +49,15 @@ onICHostReady = function(version) {
 //			menu += menuitemdiv+"<img src=\""+val1.menu[i].image+"\" class=\"menuimg\">";
 			menu += menuitemdiv;
 			menu += "<div id=\"menuimg\">";
+			if ( val1.menu[i].state == 1 ) {
 			menu += "<i class=\"gmi\" style='color: "+val1.menu[i].imgcolour+";'>"+val1.menu[i].image+"</i>";
 			menu += "</div>";
 			menu += "<div id=\"menutxt\">"+val1.menu[i].text+"</div></div>";
+			} else {
+			menu += "<i class=\"gmi\" style='color: "+val1.menu[i].imgcolour2+";'>"+val1.menu[i].image2+"</i>";
+			menu += "</div>";
+			menu += "<div id=\"menutxt\">"+val1.menu[i].text2+"</div></div>";
+			}
 
 		}
 		document.getElementById("menu").innerHTML=menu;

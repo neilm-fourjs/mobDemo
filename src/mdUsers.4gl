@@ -19,6 +19,7 @@ PUBLIC TYPE mdUsers RECORD
 	clockedOn   DATETIME YEAR TO SECOND,
 	active      SMALLINT,
 	branch      CHAR(2),
+	onMiscTask  BOOLEAN,
 	claim_today DECIMAL(10, 2),
 	claim_wtd   DECIMAL(10, 2),
 	claim_mtd   DECIMAL(10, 2),
@@ -38,6 +39,7 @@ FUNCTION (this mdUsers) init(l_mobLib moblib INOUT) RETURNS(mdUsers)
 	INITIALIZE this TO NULL
 	LET this.top_image = C_DEFIMG
 	LET this.mobLib    = l_mobLib
+	LET this.onMiscTask = FALSE
 	RETURN this
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
