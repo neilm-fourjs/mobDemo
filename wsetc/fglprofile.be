@@ -1,7 +1,7 @@
 
-#dbi.default.driver = "dbmpgs"
+dbi.default.driver = "dbmpgs"
 
-my.dbname = "trimdb"
+my.dbname = "d1234"
 
 mobile.environment.DBDATE ="DMY4/"
 

@@ -313,16 +313,11 @@ FUNCTION checkTable(l_tab STRING) RETURNS BOOLEAN
 	END TRY
 	IF x = 0 THEN
 -- Test servers
-		LET l_servers[1].api    = "trimtest"
+		LET l_servers[1].api    = "mdtest"
 		LET l_servers[1].ip     = "any"
 		LET l_servers[1].dbname = "d1234"
-		LET l_servers[1].url    = "https://test-2.bms.uk3.generocloud.net/bms320/ua/r/trim"
+		LET l_servers[1].url    = "https://generodemos.dynu.net/z/ua/r/mobDemo"
 		LET l_servers[1].added  = CURRENT
-		LET l_servers[2].api    = "trimtest2"
-		LET l_servers[2].ip     = "any"
-		LET l_servers[2].dbname = "d1234"
-		LET l_servers[2].url    = "http://10.1.0.115/g/ua/r/trimMob"
-		LET l_servers[2].added  = CURRENT
 
 		LET l_str = SFMT("INSERT INTO %1 VALUES(?, ?, ?, ? ,? )", l_tab)
 		CALL debug.output(SFMT("Running: %1 ...", l_str), FALSE)

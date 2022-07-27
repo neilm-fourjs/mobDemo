@@ -6,7 +6,7 @@ IMPORT FGL stdLib
 IMPORT FGL dbLib
 IMPORT FGL mdUsers
 
-SCHEMA bsdb
+&include "schema.inc"
 
 &define DEBUG( l_lev, l_msg ) IF this.mobLib.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
 
@@ -266,7 +266,7 @@ FUNCTION (this mdTasks) start(l_id STRING) RETURNS BOOLEAN
 		RETURN FALSE
 	END IF
 
-	CALL dbLib.activeTasks(this.mdUser.emp_rec.short_code, this.branch) RETURNING l_current, l_allocated
+	CALL dbLib.activeTasks(this.mdUser.emp_rec.short_code) RETURNING l_current
 
 	IF l_current > 0 THEN
 		DEBUG(3, "start: Already have an active task")
@@ -291,7 +291,7 @@ FUNCTION (this mdTasks) start(l_id STRING) RETURNS BOOLEAN
 
 	LET m_TasksArr[l_id].started = CURRENT
 	IF dbLib.startTask(
-			this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].started) THEN
+			this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
 		MESSAGE "Task Started"
 	ELSE
 		ERROR "Task Failed to Start!"
@@ -330,8 +330,7 @@ FUNCTION (this mdTasks) complete(l_id STRING) RETURNS BOOLEAN
 	END IF
 
 	DEBUG(1, SFMT("complete: ID: %1 JL: %2 WC: %3", l_id, this.taskRec.job_link, this.taskRec.work_code))
-	IF NOT dbLib.completeTask(
-			this.mdUser.branch, this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
+	IF NOT dbLib.completeTask(this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
 		ERROR dbLib.m_lastError
 		RETURN FALSE
 	END IF
@@ -359,7 +358,7 @@ FUNCTION (this mdTasks) stop(l_id STRING) RETURNS BOOLEAN
 
 	DEBUG(1, SFMT("stop: ID: %1 JL: %2 WC: %3", l_id, this.taskRec.job_link, this.taskRec.work_code))
 	LET m_TasksArr[l_id].stopped = CURRENT
-	IF dbLib.stopTask(this.mdUser.emp_rec.*, this.taskRec.job_link, this.taskRec.work_code, m_TasksArr[l_id].stopped) THEN
+	IF dbLib.stopTask(this.mdUser.emp_rec.short_code, this.taskRec.job_link, this.taskRec.work_code) THEN
 		LET this.rec.state                  = C_TRIMTASK_STATE_STOPPED
 		LET this.list[this.cur_idx].state   = this.rec.state
 		LET this.list[this.cur_idx].my_task = TRUE

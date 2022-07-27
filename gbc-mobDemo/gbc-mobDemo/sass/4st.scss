@@ -1,6 +1,6 @@
 
 .gbc_style_curvedborder {
-	border: 1px solid $bms-button-border-color;
+	border: 1px solid $my-button-border-color;
 	border-radius: 15px;
 	padding: 2px;
 }
@@ -24,7 +24,7 @@
 }
 
 .gbc_style_form1 {
-	background-color: $bms-primary;
+	background-color: $my-primary;
 
 	.gbc_style_login_box {
 		border-radius: 4px;
@@ -33,7 +33,7 @@
 	}
 
 	[__ComboBoxWidget] .gbc_EditWidget.mt-field {
-		background-color: $bms-light-grey;
+		background-color: $my-light-grey;
   	box-shadow: none;
   	border: none;
 	}
@@ -44,7 +44,7 @@
 	}
 
 	.gbc_ButtonEditWidget > .gbc_ButtonWidget, .gbc_DummyButtonEditWidget > .gbc_ButtonWidget {
-		background-color: $bms-light-grey;
+		background-color: $my-light-grey;
 	}
 
 	.mt-field {
@@ -52,7 +52,7 @@
   	border-radius: 0;
   	border: none;
   	box-shadow: none;
-		background-color: $bms-light-grey;
+		background-color: $my-light-grey;
 		padding: 12px 2px 12px 2px;
 		height: 50px;
 	}
@@ -60,9 +60,9 @@
   	outline: none;
   	border-radius: 0;
   	border: none;
-  	//border-bottom: 1px solid $bms-button-border-color;
+  	//border-bottom: 1px solid $my-button-border-color;
   	box-shadow: none;
-		background-color: $bms-light-grey;
+		background-color: $my-light-grey;
 		padding: 12px 2px 12px 2px;
 		height: 50px;
 	}
@@ -78,7 +78,7 @@
 }
 
 .gbc_style_login_button {
-	background-color: $bms-icon-color !important;
+	background-color: $my-icon-color !important;
 	color: white !important;
 	font-weight: 500 !important;
 	font-size: 14px !important;
@@ -114,7 +114,7 @@
 }
 
 .gbc_style_border {
-	border: 1px solid $bms-button-border-color;
+	border: 1px solid $my-button-border-color;
 	border-radius: none;
 }
 
@@ -131,9 +131,9 @@
 	box-shadow: none;
 	border-radius: 0;
 	border: none;
-	border-bottom: 1px solid $bms-button-border-color;	
+	border-bottom: 1px solid $my-button-border-color;	
 	background-color: white;
-	fill: $bms-icon-color !important;	
+	fill: $my-icon-color !important;	
 }
 
 .gbc_style_menubutton2 {

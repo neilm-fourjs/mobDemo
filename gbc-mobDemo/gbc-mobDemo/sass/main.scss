@@ -68,19 +68,19 @@ BODY {
 .mt-field {
 	outline: none;
 	border-radius: 0; //6px;
-	border-top: 1px solid $bms-button-border-color;
-	border-right: 1px solid $bms-button-border-color;
-	border-bottom: 1px solid $bms-button-border-color;
-	border-left: 1px solid $bms-button-border-color;
+	border-top: 1px solid $my-button-border-color;
+	border-right: 1px solid $my-button-border-color;
+	border-bottom: 1px solid $my-button-border-color;
+	border-left: 1px solid $my-button-border-color;
 	box-shadow: none;	
 }
 .mt-field.gbc_Focus {
 	outline: none;
 	border-radius: 0; //6px;
-	border-top: 1px solid $bms-button-border-color;
-	border-right: 1px solid $bms-button-border-color;
-	border-bottom: 3px solid $bms-button-border-color;
-	border-left: 1px solid $bms-button-border-color;
+	border-top: 1px solid $my-button-border-color;
+	border-right: 1px solid $my-button-border-color;
+	border-bottom: 3px solid $my-button-border-color;
+	border-left: 1px solid $my-button-border-color;
 	box-shadow: none;
 }
 // fix problem with border of field element of a combobox removing the top border.
@@ -90,7 +90,7 @@ BODY {
 
 .mt-button {
 	border-radius: 0; //6px;
-	border: none; //1px solid $bms-button-border-color;
+	border: none; //1px solid $my-button-border-color;
 	box-shadow: none; //3px 3px 3px 0 rgba(0, 0, 0, 0.34);
 	padding-left: 5px;
 	padding-right: 5px;
@@ -148,11 +148,11 @@ BODY {
 	}
 }
 .mt-dialog-content {
-	color: $bms-dark-grey;
+	color: $my-dark-grey;
 	font-size: 16pt;
 }
 .mt-dialog-footer {
-	color: $bms-primary;
+	color: $my-primary;
 	font-size: 14pt;
 	font-weight: 500;
 	margin-left: auto;
@@ -163,7 +163,7 @@ BODY {
 }
 
 .mt-progress{
-	border: 1px solid $bms-button-border-color;
+	border: 1px solid $my-button-border-color;
 	padding: 1px;
 	margin: 2px
 }

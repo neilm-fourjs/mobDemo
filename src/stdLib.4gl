@@ -22,6 +22,48 @@ FUNCTION stdlib_dummy()
 	WHENEVER ERROR CALL app_error
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
+-- Play a sound
+FUNCTION playSound(l_sound STRING)
+	DEFINE l_uri  STRING
+	DEFINE l_tmp  STRING
+	DEFINE l_dir  STRING
+	DEFINE l_dest STRING
+	DEFINE c      base.Channel
+
+	IF os.path.exists(l_sound) THEN -- file in current dir ?
+		LET l_uri = l_sound
+	ELSE -- no, look in ../resources
+		LET l_uri = os.path.join(os.path.dirname(os.path.pwd()), "resources/" || l_sound)
+	END IF
+
+	IF ui.Interface.getFrontEndName() = "GBC" THEN
+		LET l_uri = ui.Interface.filenameToURI(l_uri)
+	ELSE
+		CALL ui.Interface.frontCall("standard", "feinfo", "dataDirectory", l_dir)
+		LET l_dest = os.path.join(l_dir, l_sound)
+		LET l_tmp  = l_dest.append(".tmp")
+		TRY -- try and get tmp file client
+			DEBUG(2, SFMT("playSound: fgl_getFile '%1' '%2'", l_tmp, os.path.join("/tmp", l_sound.append(".tmp"))))
+			CALL fgl_getFile(l_tmp, os.path.join("/tmp", l_sound.append(".tmp")))
+			DEBUG(2, SFMT("playSound: get tmp file '%1' okay", l_tmp))
+		CATCH -- no tmp so transfer sound file and tmp file to the client
+			LET c = base.Channel.create()
+			CALL c.openFile(l_sound || ".tmp", "a+") -- create the empty temp file
+			CALL c.close()
+			DEBUG(2, SFMT("playSound: putFile '%1' to '%2'", l_uri, l_dest))
+			CALL fgl_putFile(l_uri, l_dest)
+			CALL fgl_putFile(l_sound || ".tmp", l_dest.append(".tmp"))
+		END TRY
+	END IF
+
+	TRY
+		CALL ui.Interface.frontCall("standard", "playSound", [l_dest], [])
+		DEBUG(2, SFMT("playSound: URI: %1", l_dest))
+	CATCH
+		DEBUG(0, SFMT("playSound: URI: %1 Failed: %2 %3", l_uri, STATUS, ERR_GET(STATUS)))
+	END TRY
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
 -- Popup a message box with a timeout value.
 FUNCTION popup(l_titl STRING, l_msg STRING, l_img STRING, l_timeout SMALLINT)
 	IF l_timeout = 0 THEN
@@ -88,7 +130,7 @@ FUNCTION debugOut(l_lev SMALLINT, l_mod STRING, l_lineno SMALLINT, l_msg STRING)
 	END IF
 	IF m_debugFile IS NULL THEN
 		IF m_logPath.trim().getLength() < 1 THEN
-			LET m_logPath = fgl_getEnv("TRIMLOGDIR")
+			LET m_logPath = fgl_getEnv("MDLOGPATH")
 			IF m_logPath.trim().getLength() < 1 THEN
 				LET m_logPath = "."
 			END IF

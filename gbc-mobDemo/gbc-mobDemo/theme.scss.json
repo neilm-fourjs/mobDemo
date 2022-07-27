@@ -1,12 +1,12 @@
 {
 	"Xaui-mobileUI-default": "true",
 
-	"bms-button-border-color": "#2ec2b6",
-	"bms-primary": "#084267",
-	"bms-light-grey": "#f4f4f4",
-	"bms-dark-grey": "#707070",
-	"bms-icon-color": "#00b4a5",
-	"bms-width": "435px",
+	"my-button-border-color": "#2ec2b6",
+	"my-primary": "#084267",
+	"my-light-grey": "#f4f4f4",
+	"my-dark-grey": "#707070",
+	"my-icon-color": "#00b4a5",
+	"my-width": "435px",
 
 	"theme-disable-context-menu": false,
 
@@ -26,7 +26,7 @@
 	"Xtheme-grid-inner-gutter-y": 10,
 
 	"xpalette-primary": "$mt-blue-grey",
-	"palette-primary": "$bms-primary",
+	"palette-primary": "$my-primary",
 	"palette-secondary": "$mt-grey",
 	"palette-text-secondary": "$mt-black",
 	"theme-primary-background-color": "$palette-primary-800",

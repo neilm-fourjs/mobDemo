@@ -4,13 +4,13 @@ IMPORT security
 IMPORT FGL stdLib
 IMPORT FGL mobLib
 
-SCHEMA bsdb
+&include "schema.inc"
 
 CONSTANT C_DOCEXT = "doc"
 CONSTANT C_PDFEXT = "pdf"
 CONSTANT C_IMGEXT = "jpg"
 
-&define DEBUG( l_lev, l_msg ) IF m_db_moblib.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
+&define DEBUG( l_lev, l_msg ) IF m_db_mobLib.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
 
 -- uncomment to disable update/delete from database.
 &define NOUPD 1
@@ -50,7 +50,7 @@ PUBLIC TYPE t_branches DYNAMIC ARRAY OF RECORD
 	branch_code CHAR(2),
 	branch_name VARCHAR(40)
 END RECORD
-PUBLIC DEFINE m_db_moblib  mobLib
+PUBLIC DEFINE m_db_mobLib  mobLib
 PUBLIC DEFINE m_doPopups   BOOLEAN = TRUE
 PUBLIC DEFINE m_connected  BOOLEAN
 PUBLIC DEFINE m_dbName     STRING
@@ -129,7 +129,7 @@ FUNCTION validUser(l_user STRING, l_pwd STRING) RETURNS(BOOLEAN, STRING)
 		RETURN FALSE, NULL
 	END IF
 -- Hack for testing only - only works if user 'test' actually exists in the data - which it shouldn't
-	IF l_user.subString(1, 4) = "test" AND l_pwd = "test" AND m_db_moblib.cfg.allowTest THEN
+	IF l_user.subString(1, 4) = "test" AND l_pwd = "test" AND m_db_mobLib.cfg.allowTest THEN
 		RETURN TRUE, l_users.user_name
 	END IF
 -- Actually check the users password.
@@ -144,13 +144,13 @@ END FUNCTION
 -- Check the password is valid
 FUNCTION checkPassword(l_pass STRING, l_hash STRING, l_emp BOOLEAN) RETURNS BOOLEAN
 -- TODO remove when testing finished.
-	DEBUG(3, SFMT("checkPassword: allowTest %1", m_db_moblib.cfg.allowTest))
-	IF l_pass = "test" AND m_db_moblib.cfg.allowTest AND l_emp THEN
+	DEBUG(3, SFMT("checkPassword: allowTest %1", m_db_mobLib.cfg.allowTest))
+	IF l_pass = "test" AND m_db_mobLib.cfg.allowTest AND l_emp THEN
 		RETURN TRUE
 	END IF -- TODO: remove before go live!!
 --	DEBUG(3, SFMT("PWD: %1 vs %2", l_pass.trim(), l_hash.trim()))
 	TRY
-		IF NOT Security.BCrypt.CheckPassword(l_pass.trim(), l_hash.trim()) THEN
+		IF NOT security.BCrypt.CheckPassword(l_pass.trim(), l_hash.trim()) THEN
 			RETURN FALSE
 		END IF
 	CATCH
@@ -172,12 +172,12 @@ FUNCTION getEmployee(l_empCode LIKE emp01.short_code, l_branch LIKE emp01.branch
 	IF STATUS = NOTFOUND THEN
 		CALL dbLib_error(SFMT("Employee %1 for branch %2 not found!", l_empCode, l_branch))
 		INITIALIZE l_emp TO NULL
-		RETURN l_emp.*
+		RETURN l_emp
 	END IF
 	DEBUG(2, SFMT("getEmployee: %1 @ %2 Okay", l_empCode, l_branch))
 
 	IF l_pwd IS NULL THEN
-		RETURN l_emp.*
+		RETURN l_emp
 	END IF
 
 	SELECT * FROM device_login WHERE emp_user = l_empCode AND branch_code = l_branch AND app_name = m_db_mobLib.appName
@@ -194,9 +194,9 @@ FUNCTION getEmployee(l_empCode LIKE emp01.short_code, l_branch LIKE emp01.branch
 		SELECT user_password INTO l_hash FROM users WHERE user_id = l_emp.user_id
 		IF NOT checkPassword(l_pwd.trim(), l_hash.trim(), TRUE) THEN
 --TODO: Add in the invalid login checks / count here.
-			CALL stdLib.error("Invalid Login Details", TRUE)
+			DEBUG(2, "Invalid Login Details")
 			INITIALIZE l_emp TO NULL
-			RETURN l_emp.*
+			RETURN l_emp
 		END IF
 	ELSE
 		IF l_pwd != "test" THEN
@@ -206,7 +206,7 @@ FUNCTION getEmployee(l_empCode LIKE emp01.short_code, l_branch LIKE emp01.branch
 		-- TODO: when testing finished this error will be fatal and return NULL - for now allow it to pass
 	END IF
 
-	RETURN l_emp.*
+	RETURN l_emp
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 FUNCTION checkEmployee(l_empCode LIKE emp01.short_code) RETURNS(BOOLEAN, t_branches)
@@ -260,13 +260,13 @@ FUNCTION logDeviceLogin(
 	IF l_login THEN
 		SELECT last_dev_id2, logged_in, last_login INTO l_last_dev_id, l_logged_in, l_last_login FROM device_login
 				WHERE emp_user = l_empCode AND branch_code = l_branch AND app_name = m_db_mobLib.appName
-		IF l_logged_in = "Y" AND l_last_dev_id != m_db_moblib.reg.dev_id2 THEN
+		IF l_logged_in = "Y" AND l_last_dev_id != m_db_mobLib.reg.dev_id2 THEN
 			DEBUG(0, SFMT("%1 Already logged in %2 since %3", l_empCode, l_last_dev_id, l_last_login))
 			RETURN SFMT("You are already logged in on another device\nSince %1", l_last_login)
 		END IF
 		LET l_last_login = CURRENT
 		UPDATE device_login SET (last_dev_id, last_dev_id2, last_dev_ip, last_ip, last_login, failed_attempts, logged_in)
-				= (m_db_moblib.reg.dev_id, m_db_moblib.reg.dev_id2, m_db_mobLib.reg.dev_ip, m_db_moblib.cli_ip, l_last_login, 0,
+				= (m_db_mobLib.reg.dev_id, m_db_mobLib.reg.dev_id2, m_db_mobLib.reg.dev_ip, m_db_mobLib.cli_ip, l_last_login, 0,
 						"Y")
 				WHERE emp_user = l_empCode AND branch_code = l_branch AND app_name = m_db_mobLib.appName
 	ELSE
@@ -277,250 +277,57 @@ FUNCTION logDeviceLogin(
 	RETURN NULL
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
--- Returns TRUE/FALSE for the clock on event and the number of active tasks restarted.
-FUNCTION clockOn(l_emp RECORD LIKE emp01.*) RETURNS(BOOLEAN, SMALLINT)
-	DEFINE l_trim1      RECORD LIKE trim1.*
-	DEFINE l_active     SMALLINT
-	DEFINE l_rowId      INTEGER
-	DEFINE l_clock_time LIKE trim1.swipe_time
+FUNCTION clockOff(l_empCode LIKE emp01.short_code) RETURNS BOOLEAN
+	DEFINE l_clock_time DATETIME YEAR TO SECOND
 
-&ifdef NOUP
- DEBUG(0,"clockOn: NOUPD defined - not updating database!")
- RETURN TRUE, 0
-&endif
+	DEBUG(2, SFMT("clockOff: Emp %1 ",l_empCode))
+
 
 	LET l_clock_time = CURRENT
-	INITIALIZE l_trim1.* TO NULL
-	LET l_trim1.weighting     = l_emp.weighting
-	LET l_trim1.employee_code = l_emp.short_code
-	LET l_trim1.branch_code   = l_emp.branch_code
-	LET l_trim1.work_code     = "__ON"
-	LET l_trim1.command_code  = "X"
-	LET l_trim1.job_link      = 0
-	LET l_trim1.swipe_time    = l_clock_time
-	DEBUG(2, "clockOn: Insert trim1  record")
-	BEGIN WORK
-	TRY
-		INSERT INTO trim1 VALUES(l_trim1.*)
-	CATCH
-	END TRY
-	IF STATUS != 0 THEN
-		DEBUG(0, SFMT("clockOn: Insert trim1 Failed: %1:%2", STATUS, SQLERRMESSAGE))
-		CALL dbLib_error("clockOn: Trim1 Insert failed - see logs for details")
-		RETURN FALSE, 0
-	END IF
 
-	IF l_emp.productive = "N" THEN -- should never get this far! can be Y or O(driver/valet)
-		COMMIT WORK
-		RETURN TRUE, 0
-	END IF
+	RETURN TRUE
+END FUNCTION
+--------------------------------------------------------------------------------------------------------------
+-- Returns TRUE/FALSE for the clock on event and the number of active tasks restarted.
+FUNCTION clockOn(l_empCode LIKE emp01.short_code) RETURNS(BOOLEAN, SMALLINT)
+	DEFINE l_active SMALLINT
+	DEFINE l_clock_time DATETIME YEAR TO SECOND
 
--- Taken from r_trim_man_post.4gl : FUNCTION clock_on
--- Restart Any Tasks Interrupted By Clock Off
--- LEGACY: As trim1 has such a complex key,  best to use rowid
-	DECLARE clock_on CURSOR FOR
-			SELECT ROWID, * FROM trim1
-					WHERE trim1.employee_code = l_emp.short_code AND trim1.branch_code = l_emp.branch_code
-							AND trim1.command_code <> "X" -- Not clock On
-							AND trim1.command_code <> "H" -- Not Interruption Task
-							AND trim1.command_code <> "P" -- Not Suspended
-							AND trim1.work_code <> "__ON" -- Not clock On
-	LET l_active = 0
-	FOREACH clock_on INTO l_rowId, l_trim1.*
-		DEBUG(2, SFMT("clockOn: Restarting task: %1 - %2", l_trim1.job_link, l_trim1.work_code))
-		LET l_active = l_active + 1
-		INITIALIZE l_trim1.interrupt_flag TO NULL
-		INITIALIZE l_trim1.interrupt_time TO NULL
-		LET l_trim1.command_code = "G"
-		LET l_trim1.swipe_time   = l_clock_time + 1 UNITS SECOND
-		UPDATE trim1 SET trim1.* = l_trim1.* WHERE ROWID = l_rowId
-	END FOREACH
-	COMMIT WORK
+	DEBUG(2, SFMT("clockOff: Emp %1 ",l_empCode))
 
+	LET l_clock_time = CURRENT
+
+	Let l_active = activeTasks( l_empCode )
 	RETURN TRUE, l_active
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
--- Apperently Suspended & Interruption are still 'active'
-FUNCTION activeTasks(l_empCode LIKE emp01.short_code, l_branch LIKE emp01.branch_code) RETURNS(SMALLINT, SMALLINT)
+-- Return task active count
+FUNCTION activeTasks(l_empCode LIKE emp01.short_code) RETURNS SMALLINT
 	DEFINE l_count1 SMALLINT
-	DEFINE l_count2 SMALLINT
-	DEFINE l_count3 SMALLINT
-	DEFINE l_jl, x  INTEGER
-	DEFINE l_wc     LIKE trim2.work_code
-	SELECT COUNT(*) INTO l_count1 FROM trim1
-			WHERE trim1.employee_code = l_empCode AND trim1.branch_code = l_branch
-					AND trim1.command_code <> "X" -- Not clock On
-					--AND trim1.command_code <> "H" -- Not Interruption Task
-					--AND trim1.command_code <> "P" -- Not Suspended
-					AND trim1.work_code <> "__ON" -- Not clock On
--- Here we need to count the number of trim2 tasks for the employee that are not completed,
--- NOTE we need to link in 'lasta' to catch tasks we worked on but completed by someone else.
-	DECLARE act_cur CURSOR FOR
-			SELECT UNIQUE trim2.job_link, trim2.work_code, COUNT(*) FROM trim2, lista, lists
-					WHERE trim2.employee_code = l_empCode AND trim2.branch_code = l_branch AND trim2.work_code IS NOT NULL
-							AND trim2.stop_command != "K" -- not competed by this employee
-							AND lists.work_code = trim2.work_code AND lista.job_link = trim2.job_link
-							AND lista.list_link = lists.internal_no AND lista.entry_no = 0
-							AND lista.p_status < 128 -- not completed by any employee
-					GROUP BY 1, 2
-	LET l_count2 = 0
-	FOREACH act_cur INTO l_jl, l_wc
-		IF l_wc IS NULL THEN
-			CONTINUE FOREACH
-		END IF
-		SELECT COUNT(*) INTO x FROM trim1
-				WHERE trim1.job_link = l_jl AND trim1.work_code = l_wc AND trim1.employee_code = l_empCode
-		IF x = 0 THEN
-			LET l_count2 = l_count2 + 1
-		END IF
-	END FOREACH
 
-	SELECT COUNT(*) INTO l_count3 FROM next_job WHERE employee = l_empCode AND taken IS NULL
-
-	DEBUG(3, SFMT("activeTasks: count1: %1 (trim1) count2: %2 (trim2) count3: %3 (next_job)", l_count1, l_count2, l_count3))
-	RETURN l_count1 + l_count2, l_count3
-END FUNCTION
---------------------------------------------------------------------------------------------------------------
-FUNCTION claimedTime(l_empCode LIKE emp01.short_code) RETURNS(DECIMAL(10, 2), DECIMAL(10, 2), DECIMAL(10, 2))
-	DEFINE l_claim_mtd, l_claim_wtd, l_claim_today DECIMAL(10, 2)
-
-	CALL getClaimedTime(l_empCode, TODAY, TODAY) RETURNING l_claim_today
-	CALL getClaimedTime(l_empCode, TODAY - WEEKDAY(TODAY) + 1, TODAY) RETURNING l_claim_wtd
-	CALL getClaimedTime(l_empCode, TODAY - DAY(TODAY) + 1, TODAY) RETURNING l_claim_mtd
-
-	RETURN l_claim_mtd, l_claim_wtd, l_claim_today
+	DEBUG(3, SFMT("activeTasks: emp: %1 count1: %2", l_empCode, l_count1))
+	RETURN l_count1
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Do the SQL's to actually get the claimed time
-FUNCTION getClaimedTime(l_empCode LIKE emp01.short_code, l_start_date DATE, l_end_date DATE)
-	DEFINE l_claimed_time1 DECIMAL(10, 2)
-	DEFINE l_claimed_time2 DECIMAL(10, 2)
+FUNCTION getClaimedTime(l_empCode LIKE emp01.short_code) RETURNS DECIMAL(10,2)
+	DEFINE l_claimed_time DECIMAL(10, 2)
 
-	SELECT SUM(claimed) INTO l_claimed_time1 FROM trim2
-			WHERE trim2.employee_code = l_empCode AND trim2.start_command <> "X"
-					AND trim2.txn_date BETWEEN l_start_date AND l_end_date
+	DEBUG(2, SFMT("getClaimedTime: Emp %1 ",l_empCode))
 
-	SELECT SUM(claimed) INTO l_claimed_time2 FROM trim2b
-			WHERE trim2b.employee_code = l_empCode AND trim2b.start_command <> "X"
-					AND trim2b.txn_date BETWEEN l_start_date AND l_end_date
 
-	IF l_claimed_time1 IS NULL THEN
-		LET l_claimed_time1 = 0
-	END IF
-	IF l_claimed_time2 IS NULL THEN
-		LET l_claimed_time2 = 0
-	END IF
-
-	RETURN l_claimed_time1 + l_claimed_time2
+	RETURN l_claimed_time
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION clockOff(l_emp RECORD LIKE emp01.*) RETURNS BOOLEAN
-	DEFINE l_trim1      RECORD LIKE trim1.*
-	DEFINE l_trim2      RECORD LIKE trim2.*
-	DEFINE l_clock_time LIKE trim1.swipe_time
-	DEFINE l_rowId      INTEGER
-
-&ifdef NOUPD
-	DEBUG(0, "clockOff: NOUPD defined - not updating database!")
-	RETURN TRUE
-&endif
+FUNCTION startTask(l_empCode LIKE emp01.short_code, l_job_link INTEGER, l_work_code CHAR(4))
+		RETURNS BOOLEAN
+	DEFINE l_clock_time DATETIME YEAR TO SECOND
 
 	LET l_clock_time = CURRENT
 
-	SELECT * INTO l_trim1.* FROM trim1
-			WHERE trim1.employee_code = l_emp.short_code AND trim1.branch_code = l_emp.branch_code
-					AND trim1.work_code = "__ON" AND trim1.command_code = "X"
-	IF STATUS = NOTFOUND THEN -- Not clock on ?
-		RETURN FALSE
-	END IF
-
--- Insert Clock On Command Into trim2
-	INITIALIZE l_trim2.* TO NULL
-	LET l_trim2.actual_time    = 0
-	LET l_trim2.txn_date       = TODAY
-	LET l_trim2.txn_period     = 0
-	LET l_trim2.start_datetime = l_trim1.swipe_time
--- Advance By 2 Seconds
-	LET l_trim2.end_datetime  = l_clock_time + 2 UNITS SECOND
-	LET l_trim2.interval_time = l_trim2.end_datetime - l_trim2.start_datetime
-	LET l_trim2.decimal_time  = 0 --conv_time_to_dec_(l_trim2.interval_time)
-	LET l_trim2.actual_cost   = 0
-	LET l_trim2.job_link      = 0
-	LET l_trim2.weighting     = l_trim1.weighting
-	LET l_trim2.employee_code = l_emp.short_code
-	LET l_trim2.branch_code   = l_emp.branch_code
-	LET l_trim2.start_command = "X"
-	LET l_trim2.stop_command  = "Y"
-	LET l_trim2.txn_no        = 0
-
-	DEBUG(2, "clockOff: Insert trim2 record.")
-	BEGIN WORK
-	INSERT INTO trim2 VALUES(l_trim2.*)
-	LET l_trim2.txn_no = SQLCA.SQLERRD[2]
--- Insert Mirror File
-	INSERT INTO trim2a VALUES(l_trim2.*)
-
--- Here Insert Clock Off Marker Into trim2}
--- Set Clock Of Time Same As Time In Clock On Marker}
-	LET l_trim2.start_datetime = l_trim2.end_datetime
-	LET l_trim2.end_datetime   = l_trim2.start_datetime
-	LET l_trim2.decimal_time   = 0
-	LET l_trim2.actual_cost    = 0
-	LET l_trim2.interval_time  = "00:00"
-	LET l_trim2.start_command  = "Y"
-	LET l_trim2.txn_no         = 0
-	INSERT INTO trim2 VALUES(l_trim2.*)
-	LET l_trim2.txn_no = SQLCA.SQLERRD[2]
--- Insert Mirror File
-	INSERT INTO trim2a VALUES(l_trim2.*)
-
--- Remove trim1 record
-	DEBUG(2, "clockOff: Removing trim1 record")
-	DELETE FROM trim1
-			WHERE trim1.employee_code = l_emp.short_code AND trim1.branch_code = l_emp.branch_code
-					AND trim1.work_code = "__ON" AND trim1.command_code = "X"
-
-{ Here Handle Interrupting Tasks By Clocking Off
-  We Have To Read Every Task In Trim1, Update interrupt
-  Flag & Time But Leave trim1, Write Away To Trim2
-  Then Write Clock Off To Trim2, When We Clock Back On
-  The Suspended Tasks Are Restarted After Clock On Written
-  To Trim2 Wow If This Works We Are Half Way To Hell}
-
-	DECLARE clock_off CURSOR FOR
-			SELECT ROWID, * FROM trim1
-					WHERE trim1.employee_code = l_emp.short_code AND trim1.branch_code = l_emp.branch_code
-							AND trim1.command_code <> "P" AND trim1.command_code <> "H"
-	FOREACH clock_off INTO l_rowId, l_trim1.*
-		DEBUG(2, SFMT("clockOff: Interrupting task: %1 - %2", l_trim1.job_link, l_trim1.work_code))
-		LET l_trim1.interrupt_flag = "Y"
-		LET l_trim1.interrupt_time = l_clock_time + 2 UNITS SECOND
-		UPDATE trim1 SET trim1.* = l_trim1.* WHERE ROWID = l_rowId
-	END FOREACH
-	COMMIT WORK
-
-	RETURN TRUE
-END FUNCTION
---------------------------------------------------------------------------------------------------------------
-FUNCTION startTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CHAR(4), l_dt DATETIME YEAR TO SECOND)
-		RETURNS BOOLEAN
-	DEFINE l_trim1       RECORD LIKE trim1.*
-	DEFINE l_list_link   INTEGER
-	DEFINE l_in_progress DATE
-	DEFINE l_command     CHAR(1)
-	DEFINE l_args        STRING
-	DEFINE l_ret         SMALLINT
-	DEFINE l_p_status    LIKE lista.p_status
-	DEFINE l_lista_trim  RECORD LIKE lista_trim.*
-
-&ifdef NOUPD
-	DEBUG(0, "startTask: NOUPD defined - not updating database!")
-	RETURN TRUE
-&endif
-
-	DEBUG(2, SFMT("startTask: %1:%2:%3:%4", l_emp.branch_code, l_emp.short_code, l_job_link, l_work_code))
+	DEBUG(2, SFMT("startTask: emp: %1 jl: %2 wc: %3", l_empCode, l_job_link, l_work_code))
 -- Basic sanity checks
-	IF l_emp.short_code IS NULL THEN
+	IF l_empCode IS NULL THEN
 		CALL dbLib_error("Invalid Employee Code!")
 		RETURN FALSE
 	END IF
@@ -531,100 +338,20 @@ FUNCTION startTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CH
 	IF l_work_code IS NULL THEN
 		CALL dbLib_error("Invalid Work Code!")
 		RETURN FALSE
-	END IF
-
--- Look to see if the trim1 record already exists.
-	INITIALIZE l_trim1 TO NULL
-	SELECT * INTO l_trim1.* FROM trim1
-			WHERE trim1.work_code = l_work_code AND trim1.job_link = l_job_link AND trim1.employee_code = l_emp.short_code
-					AND trim1.branch_code = l_emp.branch_code
-	IF l_trim1.command_code = "K" THEN
-		CALL dbLib_error("Task already completed!")
-		RETURN FALSE
-	END IF
-	IF l_trim1.command_code MATCHES "[SG]" THEN -- Started / Autostarted after clock on
-		CALL dbLib_error("Task already started!")
-		RETURN FALSE
-	END IF
-	IF STATUS != NOTFOUND THEN
-		CALL dbLib_error("Task already in trim1!") -- Shouldn't happen ?
-		RETURN FALSE
-	END IF
-
-	SELECT internal_no INTO l_list_link FROM lists WHERE @work_code = l_work_code
-	IF STATUS = NOTFOUND THEN
-		CALL dbLib_error(SFMT("Task '%1' not found in lists!", l_work_code)) -- Shouldn't happen ?
-		RETURN FALSE
-	END IF
-
-{
-	LET l_command = "S"
-	LET l_args = SFMT("%1 %2 %3 %4 %5", l_branch, l_emp_code, l_job_link, l_work_code, l_command)
-	LET l_ret  = m_mobLib.runProg("trimUpdateTask", l_args)
-	IF l_ret != 0 THEN
-		CALL dbLib_error("Failed to Start task!" )
-		RETURN FALSE
-	END IF
-}
-
-	INITIALIZE l_trim1.* TO NULL
-	LET l_trim1.weighting     = l_emp.weighting
-	LET l_trim1.employee_code = l_emp.short_code
-	LET l_trim1.branch_code   = l_emp.branch_code
-	LET l_trim1.job_link      = l_job_link
-	LET l_trim1.work_code     = l_work_code
-	LET l_trim1.command_code  = "S"
-	LET l_trim1.swipe_time    = l_dt
-
-	DEBUG(2, "startTask: Insert trim1 record")
-	TRY
-		INSERT INTO trim1 VALUES(l_trim1.*)
-	CATCH
-	END TRY
-	IF STATUS != 0 THEN
-		DEBUG(0, SFMT("startTask: Insert trim1 Failed: %1:%2", STATUS, SQLERRMESSAGE))
-		CALL dbLib_error("Trim1 Insert failed - see logs for details")
-		RETURN FALSE
-	END IF
-
-	CALL create_lista_trim2(l_job_link, l_list_link, l_work_code) RETURNING l_lista_trim.*
-	IF l_lista_trim.task_start IS NULL THEN
-		UPDATE lista_trim SET lista_trim.task_start = CURRENT
-				WHERE lista_trim.job_link = l_job_link AND lista_trim.list_link = l_list_link
-	END IF
-
-	SELECT p_status INTO l_p_status FROM lista
-			WHERE lista.job_link = l_job_link AND lista.list_link = l_list_link AND lista.entry_no = 0
-	IF STATUS = NOTFOUND THEN
-		DEBUG(2, "startTask: lista record not found!")
-	ELSE
-		LET l_p_status = 64
-		UPDATE lista SET lista.p_status = l_p_status
-				WHERE lista.job_link = l_job_link AND lista.list_link = l_list_link AND lista.entry_no = 0
-	END IF
-
-	SELECT in_progress INTO l_in_progress FROM job_dates WHERE job_link = l_job_link
-	IF l_in_progress IS NULL THEN
-		UPDATE job_dates SET (in_progress, in_progress1) = (l_dt, l_dt) WHERE job_link = l_job_link
 	END IF
 
 	RETURN TRUE
 END FUNCTION # Transaction_process
 --------------------------------------------------------------------------------------------------------------
-FUNCTION stopTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CHAR(4), l_dt DATETIME YEAR TO SECOND)
+FUNCTION stopTask(l_empCode LIKE emp01.short_code, l_job_link INTEGER, l_work_code CHAR(4))
 		RETURNS BOOLEAN
-	DEFINE l_trim1      RECORD LIKE trim1.*
-	DEFINE l_clock_time LIKE trim1.swipe_time
-	DEFINE l_trim2_key  INTEGER
-&ifdef NOUPD
-	DEBUG(0, "stopTask: NOUPD defined - not updating database!")
-	RETURN TRUE
-&endif
+	DEFINE l_clock_time DATETIME YEAR TO SECOND
+	DEBUG(2, SFMT("stopTask: emp: %1 jl: %2 wc: %3", l_empCode, l_job_link, l_work_code))
 
 	LET l_clock_time = CURRENT
-	DEBUG(2, SFMT("stopTask: %1:%2:%3:%4", l_emp.branch_code, l_emp.short_code, l_job_link, l_work_code))
+
 -- Basic sanity checks
-	IF l_emp.short_code IS NULL THEN
+	IF l_empCode IS NULL THEN
 		CALL dbLib_error("Invalid Employee Code!")
 		RETURN FALSE
 	END IF
@@ -634,30 +361,6 @@ FUNCTION stopTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CHA
 	END IF
 	IF l_work_code IS NULL THEN
 		CALL dbLib_error("Invalid Work Code!")
-		RETURN FALSE
-	END IF
-
-	SELECT * INTO l_trim1.* FROM trim1
-			WHERE trim1.work_code = l_work_code AND trim1.job_link = l_job_link AND trim1.employee_code = l_emp.short_code
-					AND trim1.branch_code = l_emp.branch_code
-	IF STATUS = NOTFOUND THEN
-		CALL dbLib_error("Task not started!")
-		RETURN FALSE
-	END IF
-
-	IF l_trim1.command_code = "K" THEN
-		CALL dbLib_error("Task already completed!")
-		RETURN FALSE
-	END IF
-
-	IF NOT l_trim1.command_code MATCHES "[SG]" THEN
-		CALL dbLib_error("Task not set to started!")
-		RETURN FALSE
-	END IF
-
---	LET l_trim2_key = transaction_process_stop(l_emp.pay_method, l_clock_time, "E", l_trim1.*)
-	IF l_trim2_key = 0 THEN
-		CALL dbLib_error("Stop process failed!")
 		RETURN FALSE
 	END IF
 
@@ -665,32 +368,18 @@ FUNCTION stopTask(l_emp RECORD LIKE emp01.*, l_job_link INTEGER, l_work_code CHA
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- NOTE: Now not being used becuse we are using the  trimUpdateTask program instead.
-FUNCTION completeTask(
-		l_branch LIKE bra01.branch_code, l_emp_code LIKE emp01.short_code, l_job_link INTEGER, l_work_code CHAR(4))
+FUNCTION completeTask(l_empCode LIKE emp01.short_code, l_job_link INTEGER, l_work_code CHAR(4))
 		RETURNS BOOLEAN
-	DEFINE x            SMALLINT
-	DEFINE l_no_running SMALLINT
-	DEFINE l_trim1      RECORD LIKE trim1.*
-	DEFINE l_clock_time LIKE trim1.swipe_time
-	DEFINE l_args       STRING
-	DEFINE l_ret        INT
-	DEFINE l_command    CHAR(1)
-&ifdef NOUPD
-	DEBUG(0, "completeTask: NOUPD defined - not updating database!")
-	CALL dbLib_error("NOUPD defined - not updating database!")
-	RETURN FALSE
-&endif
+	DEFINE l_clock_time DATETIME YEAR TO SECOND
 
 	LET l_clock_time = CURRENT
-	DEBUG(2, SFMT("completeTask: %1:%2:%3:%4", l_branch, l_emp_code, l_job_link, l_work_code))
-	SELECT COUNT(*) INTO x FROM trim1
-			WHERE trim1.work_code = l_work_code AND trim1.job_link = l_job_link AND trim1.employee_code = l_emp_code
-					AND trim1.branch_code = l_branch
-	IF x = 0 THEN
-		CALL dbLib_error("Task not started!")
+	DEBUG(2, SFMT("completeTask: emp: %1 jl: %2 wc: %3", l_empCode, l_job_link, l_work_code))
+
+-- Basic sanity checks
+	IF l_empCode IS NULL THEN
+		CALL dbLib_error("Invalid Employee Code!")
 		RETURN FALSE
 	END IF
-
 	IF l_job_link IS NULL THEN
 		CALL dbLib_error("Invalid Job Link!")
 		RETURN FALSE
@@ -700,131 +389,29 @@ FUNCTION completeTask(
 		RETURN FALSE
 	END IF
 
-	SELECT * INTO l_trim1.* FROM trim1
-			WHERE trim1.work_code = l_work_code AND trim1.job_link = l_job_link AND trim1.employee_code = l_emp_code
-					AND trim1.branch_code = l_branch
-	IF STATUS = NOTFOUND THEN
-		CALL dbLib_error("Task not started!")
-		RETURN FALSE
-	END IF
-
--- check no one else has started work on this work_code
-	SELECT COUNT(*) INTO l_no_running FROM trim1 WHERE trim1.work_code = l_work_code AND trim1.job_link = l_job_link
-	IF l_no_running > 1 THEN
-		CALL dbLib_error("Can't complete because tasks still acvite.")
-		RETURN FALSE
-	END IF
-
-	LET l_command = "K"
-	LET l_args    = SFMT("%1 %2 %3 %4 %5", l_branch, l_emp_code, l_job_link, l_work_code, l_command)
-	LET l_ret     = runProg("trimUpdateTask", l_args)
-	IF l_ret != 0 THEN
-		CALL dbLib_error("Failed to set task complete!")
-		RETURN FALSE
-	END IF
-
 	RETURN TRUE
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION checkTaskHeld(l_joblink INT, l_work_code LIKE trim1.work_code, l_complete BOOLEAN) RETURNS(BOOLEAN, STRING)
+FUNCTION checkTaskHeld(l_job_link INT, l_work_code LIKE trim1.work_code, l_complete BOOLEAN) RETURNS(BOOLEAN, STRING)
 	DEFINE l_mess      STRING
 	DEFINE l_held      BOOLEAN
 	DEFINE l_who_by    STRING
-	DEFINE l_list_link INTEGER
+
 	-- get the list_link
-	SELECT internal_no INTO l_list_link FROM lists WHERE work_code = l_work_code
-	# Now check the task isn't held (and incidentally show any alerts)
-{	IF l_complete THEN
-		CALL task_alert_c(l_joblink, l_list_link) RETURNING l_held, l_mess, l_who_by
-	ELSE
-		CALL task_alert_s(l_joblink, l_list_link) RETURNING l_held, l_mess, l_who_by
-	END IF}
+	DEBUG(2, SFMT("checkTaskHeld: jl: %1 wc: %2 comp: %3", l_job_link, l_work_code, l_complete))
+
 	IF l_held THEN # Held From Starting
 		LET l_mess = "Held By: ", l_who_by CLIPPED, "\n'", l_mess CLIPPED, "'"
 	END IF
 	RETURN l_held, l_mess.trim()
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION clearHold(l_joblink INT, l_work_code LIKE trim1.work_code, l_emp LIKE emp01.short_code)
-	DEFINE l_list_link INTEGER
+FUNCTION clearHold(l_job_link INT, l_work_code LIKE trim1.work_code, l_emp LIKE emp01.short_code)
+
+	DEBUG(2, SFMT("clearHold: jl: %1 wc: %2 emp: %3", l_job_link, l_work_code, l_emp))
 	-- get the list_link
-	SELECT internal_no INTO l_list_link FROM lists WHERE work_code = l_work_code
-	# write back last viewer to task_hold
-	UPDATE task_hold SET last_seen_by = l_emp
-			WHERE job_link = l_joblink AND list_link = l_list_link AND block = "N" AND cleared_dt IS NULL
 
-	# If auto clear is set, don't pester the next person:
-	UPDATE task_hold SET cleared_dt = CURRENT YEAR TO MINUTE, cleared_by = "^" || l_emp
-			WHERE job_link = l_joblink AND list_link = l_list_link AND cleared_dt IS NULL AND block = "N" AND auto_clear = "Y"
 END FUNCTION
---------------------------------------------------------------------------------------------------------------
-FUNCTION create_lista_trim2(l_job_link INTEGER, l_list_link INTEGER, l_work_code LIKE lists.work_code)
-	DEFINE
-		l_lista      RECORD LIKE lista.*,
-		l_lista_trim RECORD LIKE lista_trim.*,
-		l_dt1        DATETIME YEAR TO SECOND,
-		l_dt2        DATETIME YEAR TO SECOND,
-		l_sdt        DATETIME YEAR TO MINUTE,
-		l_edt        DATETIME YEAR TO MINUTE
-
-	SELECT * INTO l_lista_trim.* FROM lista_trim
-			WHERE lista_trim.job_link = l_job_link AND lista_trim.list_link = l_list_link AND lista_trim.entry_no = 0
-	IF STATUS = 0 THEN
-		IF l_lista_trim.recorded_time IS NULL THEN
-			LET l_lista_trim.recorded_time = 0
-		END IF
-		IF l_lista_trim.claimed_time IS NULL THEN
-			LET l_lista_trim.claimed_time = 0
-		END IF
-		RETURN l_lista_trim.*
-	END IF
-
-	SELECT * INTO l_lista.* FROM lista
-			WHERE lista.job_link = l_job_link AND lista.list_link = l_list_link AND lista.entry_no = 0
-
-	SELECT MAX(end_datetime) INTO l_dt1 FROM trim2
-			WHERE trim2.job_link = l_job_link AND trim2.work_code = l_work_code AND trim2.stop_command = "K"
-
-	SELECT MAX(end_datetime) INTO l_dt2 FROM trim2b
-			WHERE trim2b.job_link = l_job_link AND trim2b.work_code = l_work_code AND trim2b.stop_command = "K"
-	IF l_dt1 > l_dt2 THEN
-		LET l_edt = l_dt1
-	ELSE
-		LET l_edt = l_dt2
-	END IF
-
-	SELECT MAX(start_datetime) INTO l_dt1 FROM trim2
-			WHERE trim2.job_link = l_job_link AND trim2.work_code = l_work_code AND trim2.stop_command = "K"
-
-	SELECT MAX(start_datetime) INTO l_dt2 FROM trim2b
-			WHERE trim2b.job_link = l_job_link AND trim2b.work_code = l_work_code AND trim2b.stop_command = "K"
-	IF l_dt1 > l_dt2 THEN
-		LET l_sdt = l_dt1
-	ELSE
-		LET l_sdt = l_dt2
-	END IF
-
-	LET l_lista_trim.job_link      = l_job_link
-	LET l_lista_trim.list_link     = l_list_link
-	LET l_lista_trim.entry_no      = 0
-	LET l_lista_trim.task_end      = l_edt
-	LET l_lista_trim.task_start    = l_sdt
-	LET l_lista_trim.recorded_time = l_lista.actual_hours
-	LET l_lista_trim.claimed_time  = 0
-	IF l_lista_trim.recorded_time IS NULL THEN
-		LET l_lista_trim.recorded_time = 0
-	END IF
-	IF l_lista_trim.claimed_time IS NULL THEN
-		LET l_lista_trim.claimed_time = 0
-	END IF
-
-	DELETE FROM lista_trim
-			WHERE lista_trim.job_link = l_job_link AND lista_trim.list_link = l_list_link AND lista_trim.entry_no = 0
-
-	INSERT INTO lista_trim VALUES(l_lista_trim.*)
-
-	RETURN l_lista_trim.*
-END FUNCTION # create_lista_trim()
 --------------------------------------------------------------------------------------------------------------
 FUNCTION execute(l_stmt STRING)
 	DEBUG(2, SFMT("execute: PrepareStmt:\n%1", l_stmt))
@@ -856,6 +443,8 @@ FUNCTION taskCursor(l_rows SMALLINT, l_age SMALLINT, l_branch CHAR(2)) RETURNS S
 	DEFINE l_onsiteonly      CHAR(1) = "N" -- appently we don't car if the vehicle is 'onsite' or not.
 	DEFINE l_usergroup       STRING
 	LET l_threshold = CURRENT - l_age UNITS DAY
+
+	DEBUG(2, SFMT("taskCursor: rows: %1 age: %2 branch: %3", l_rows, l_age, l_branch))
 
 	LET l_q1 =
 &ifdef OPTIMIZE1
@@ -961,13 +550,14 @@ FUNCTION getTaskData(
 	DEFINE l_data STRING
 	DEFINE l_arr  DYNAMIC ARRAY OF t_listData1
 
+	DEBUG(2, SFMT("getTaskData: Br:%1 E:%2 R:%3 A:%4 D:%5 C:%6", l_branch, l_emp, l_rows, l_age, l_delivery, l_collection))
+
 	LET l_data = getData("getTasks_" || l_emp || ".json")
 	IF l_data IS NOT NULL THEN
 		CALL util.JSON.parse(l_data, l_arr)
 		RETURN l_arr
 	END IF
 
-	DEBUG(2, SFMT("getTaskData: Br:%1 E:%2 R:%3 A:%4 D:%5 C:%6", l_branch, l_emp, l_rows, l_age, l_delivery, l_collection))
 	LET l_q1 = taskCursor(l_rows: l_rows, l_age: l_age, l_branch: l_branch)
 --	LET l_q1 = "SELECT 'jn', job_link FROM next_job WHERE employee = '",l_emp,"' AND branch = '",l_branch,"' ORDER BY job_link"
 	DEBUG(2, l_q1)
@@ -1170,24 +760,20 @@ END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Put a file to cloud storage
 FUNCTION putFileForJob(l_job_link LIKE job01.job_link, l_path STRING, l_file STRING) RETURNS BOOLEAN
-	DEFINE l_context STRING
-	DEFINE l_stat    SMALLINT
-	DEFINE l_source  STRING
+
+	DEBUG(2, SFMT("putFileForJob: jl: %1 path: %2 file: %3", l_job_link, l_path, l_file ))
 
 	CALL dbLib_error("Cloud Store not enabled.")
 	RETURN FALSE
-
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Get a file from cloud storage
 FUNCTION getFileForJob(l_job_link LIKE job01.job_link, l_path STRING, l_file STRING) RETURNS BOOLEAN
-	DEFINE l_context STRING
-	DEFINE l_stat    SMALLINT
-	DEFINE l_target  STRING
+
+	DEBUG(2, SFMT("getFileForJob: jl: %1 path: %2 file: %3", l_job_link, l_path, l_file ))
 
 	CALL dbLib_error("Cloud Store not enabled.")
 	RETURN FALSE
-
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Get a documents / image list from local and cloud storage
@@ -1201,10 +787,8 @@ FUNCTION getDocsForJob(l_job_link LIKE job01.job_link, l_dir1 STRING, l_dir2 STR
 	DEFINE l_ext      STRING
 	DEFINE l_handle   INTEGER
 	DEFINE l_path     STRING
-	DEFINE x, y, z, i SMALLINT
-	DEFINE l_context  STRING
-	DEFINE l_stat     SMALLINT
-	DEFINE l_skip     BOOLEAN
+	DEFINE x SMALLINT
+
 	DEBUG(3, SFMT("getDocsForJob: 1: %1 2: %2", l_dir1, l_dir2))
 
 	CALL os.Path.dirSort("name", 1)
@@ -1217,14 +801,14 @@ FUNCTION getDocsForJob(l_job_link LIKE job01.job_link, l_dir1 STRING, l_dir2 STR
 				EXIT WHILE
 			END IF
 
-			IF os.path.isDirectory(l_path) THEN
+			IF os.Path.isDirectory(l_path) THEN
 				--DISPLAY "Dir:",path
 				CONTINUE WHILE
 			ELSE
 				--DISPLAY "Fil:",path
 			END IF
 
-			LET l_ext = os.path.extension(l_path).toLowerCase()
+			LET l_ext = os.Path.extension(l_path).toLowerCase()
 			IF l_ext IS NULL OR (l_ext != C_DOCEXT AND l_ext != C_IMGEXT AND l_ext != C_PDFEXT) THEN
 				CONTINUE WHILE
 			END IF
@@ -1248,14 +832,14 @@ FUNCTION getDocsForJob(l_job_link LIKE job01.job_link, l_dir1 STRING, l_dir2 STR
 				EXIT WHILE
 			END IF
 
-			IF os.path.isDirectory(l_path) THEN
+			IF os.Path.isDirectory(l_path) THEN
 				--DISPLAY "Dir:",path
 				CONTINUE WHILE
 			ELSE
 				--DISPLAY "Fil:",path
 			END IF
 
-			LET l_ext = os.path.extension(l_path).toLowerCase()
+			LET l_ext = os.Path.extension(l_path).toLowerCase()
 			IF l_ext IS NULL OR (l_ext != C_DOCEXT AND l_ext != C_IMGEXT AND l_ext != C_PDFEXT) THEN
 				CONTINUE WHILE
 			END IF
@@ -1311,94 +895,20 @@ FUNCTION getPartsForJob(l_job_link LIKE job01.job_link)
 		line2    STRING,
 		line_img STRING
 	END RECORD
-	DEFINE l_expected_date DATE
-	DEFINE l_parts         RECORD LIKE parts.*
-	DEFINE l_list_title    LIKE lists.list_title
-	DEFINE x               SMALLINT = 0
-	DEFINE l_status        STRING
 	DEFINE l_data          STRING
 
+	DEBUG(2, SFMT("getPartsForJob: JL: %1", l_job_link))
 	LET l_data = getData("getPartsForJob_" || l_job_link || ".json")
 	IF l_data IS NOT NULL THEN
 		CALL util.JSON.parse(l_data, l_arr)
 		RETURN l_arr
 	END IF
 
-	DECLARE c_get_parts_enq CURSOR FOR
-			SELECT parts.*, list_title FROM parts, lists
-					WHERE job_link = l_job_link AND entry_no <> 0 AND internal_no = list_link AND list_type IN ("P", "S")
-					ORDER BY list_link, entry_no ASC
+--TODO: getData
 
-	FOREACH c_get_parts_enq INTO l_parts.*, l_list_title
-		IF l_parts.p_status = "N" THEN
-			CONTINUE FOREACH
-		END IF
-		LET x              = x + 1
-		LET l_arr[x].line1 = l_parts.description
-		CASE l_parts.p_status
-			WHEN "N"
-				LET l_status = "Not Required"
-			WHEN "O"
-				LET l_status = "Ordered"
-			WHEN "D"
-				LET l_status = "Delivered"
-			WHEN "P"
-				LET l_status = "Partly Delivered"
-			WHEN "B"
-				LET l_status = "Back Ordered"
-			WHEN "M"
-				LET l_status = "Memo"
-			WHEN "R"
-				LET l_status = "Returned"
-			WHEN "C"
-				LET l_status = "Credited"
-			WHEN "S"
-				LET l_status = "Sent To Stock"
-			OTHERWISE
-				IF l_parts.p_status IS NULL THEN
-					LET l_parts.p_status = " " -- avoid null check errors.
-					LET l_status         = "Not Ordered"
-				ELSE
-					LET l_status = SFMT("Unknown Status '%1'", l_parts.p_status)
-				END IF
-		END CASE
-		LET l_expected_date = NULL
-		CASE l_list_title
-			WHEN "NEW PARTS"
-				IF l_parts.stock_no IS NOT NULL THEN
-					LET l_arr[x].line1 = l_arr[x].line1.append(SFMT(" ( %1 )", l_parts.stock_no CLIPPED))
-				END IF
-				LET l_arr[x].line_img = "parts"
-				IF l_parts.no_delivered > 0 AND l_parts.p_status = "D" THEN
-					LET l_arr[x].line_img = "parts_del"
-				END IF
-				IF l_parts.order_no IS NOT NULL AND l_parts.back_order = "N" THEN
-					SELECT required_date INTO l_expected_date FROM ord01
-							WHERE ord01.order_no = l_parts.order_no AND ord01.job_link = l_parts.job_link
-				END IF
-				IF l_parts.order_date IS NOT NULL AND l_parts.back_order = "Y" THEN
-					LET l_expected_date = DATE(l_parts.back_order_dt)
-				END IF
-				IF l_expected_date IS NOT NULL AND l_parts.p_status != "D" AND l_parts.p_status != "N" THEN
-					LET l_status = SFMT(" Expected: <b>%1</b>", l_expected_date)
-				END IF
-				IF l_parts.bin_loc IS NOT NULL AND l_parts.p_status = "D" THEN
-					LET l_status = SFMT(" Bin: <b>%1</b>", l_parts.bin_loc CLIPPED)
-				END IF
-
-				LET l_arr[x].line2 = SFMT("Qty: <b>%1</b> %2", l_parts.quantity, l_status)
-			WHEN "SPECIALIST SERVICES"
-				LET l_arr[x].line_img = "services"
-				LET l_arr[x].line2    = l_status
-			OTHERWISE
-				LET l_arr[x].line_img = "help"
-		END CASE
-		DEBUG(3, SFMT("getPartsForJob: %1 %2 PS: %3 EX: %4 BO: %5 S: %6", l_list_title CLIPPED, l_parts.description, l_parts.p_status, l_expected_date, l_parts.back_order, l_status))
-
-	END FOREACH
 	DEBUG(2, SFMT("getPartsForJob: JL: %1 Rows: %2", l_job_link, l_arr.getLength()))
 &ifdef DUMPDATA
-	CALL dumpData("getPartsForJob_" || l_job_link || ".json", util.json.stringify(l_arr))
+	CALL dumpData("getPartsForJob_" || l_job_link || ".json", util.JSON.stringify(l_arr))
 &endif
 	RETURN l_arr
 END FUNCTION
@@ -1410,19 +920,9 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 		line2    STRING,
 		line_img STRING
 	END RECORD
-	DEFINE x             SMALLINT
-	DEFINE l_lists_rec   RECORD LIKE lists.*
-	DEFINE l_lista_rec   RECORD LIKE lista.*
-	DEFINE l_cnt         SMALLINT
-	DEFINE l_overrun_b   BOOLEAN
-	DEFINE l_running     BOOLEAN
-	DEFINE l_started     BOOLEAN
-	DEFINE l_isAllocated BOOLEAN
-	DEFINE l_st          STRING
-	DEFINE l_overrun     DECIMAL(9, 2)
-	DEFINE l_worked_time DECIMAL(9, 2)
-	DEFINE l_interval    INTERVAL DAY(3) TO SECOND
 	DEFINE l_data        STRING
+
+	DEBUG(2, SFMT("getTasksForJob JL: %1", l_job_link))
 
 	LET l_data = getData("getTasksForJob_" || l_job_link || ".json")
 	IF l_data IS NOT NULL THEN
@@ -1430,91 +930,10 @@ FUNCTION getTasksForJob(l_job_link LIKE job01.job_link)
 		RETURN l_arr
 	END IF
 
-	LET l_overrun = 0
-	IF l_overrun IS NULL OR l_overrun < 1 THEN
-		DEBUG(0, "TRIM_OVERRUN appears to be broken")
-		LET l_overrun = 1.05
-	END IF
+--TODO: getData
 
-	DECLARE tfj_cur CURSOR FOR
-			SELECT * FROM lista, lists
-					WHERE lista.job_link = l_job_link AND lista.entry_no = 0 -- ORDER BY estimated_date, list_link
-							AND lists.internal_no = lista.list_link
-					ORDER BY report_no ASC
-	--DECLARE tfj_ls_cur CURSOR FOR SELECT * FROM lists WHERE lists.internal_no = l_lista_rec.list_link
-	FOREACH tfj_cur INTO l_lista_rec.*, l_lists_rec.*
-		IF l_lists_rec.job_sheet_title IS NULL THEN
-			CONTINUE FOREACH
-		END IF
-		--OPEN tfj_ls_cur
-		--FETCH tfj_ls_cur INTO l_lists_rec.*
-		--CLOSE tfj_ls_cur
-
--- Look for a trim1 record to see if it's in-progress
-		LET l_running     = FALSE
-		LET l_started     = FALSE
-		LET l_isAllocated = FALSE
-		LET l_worked_time = 0
-		SELECT COUNT(*), SUM(CURRENT - swipe_time) INTO l_cnt, l_interval FROM trim1
-				WHERE job_link = l_job_link AND work_code = l_lists_rec.work_code AND trim1.interrupt_flag IS NULL
-						AND trim1.interrupt_time IS NULL
-		IF l_cnt > 0 THEN
-			LET l_running = TRUE
-		END IF
-		IF l_running THEN
-			LET l_started = TRUE
-			--		LET l_worked_time = conv_time_to_dec_(l_interval)
-		ELSE
-			IF l_lista_rec.actual_hours IS NOT NULL AND l_lista_rec.actual_hours > 0 THEN
-				LET l_started = TRUE
-			END IF
-		END IF
-
-		LET l_worked_time = l_worked_time + l_lista_rec.actual_hours
-		LET l_overrun_b   = l_worked_time * l_overrun > l_lista_rec.workshop_hours
-
-		SELECT COUNT(*) INTO l_cnt FROM next_job
-				WHERE next_job.job_link = l_job_link AND next_job.task = l_lista_rec.list_link AND next_job.taken IS NULL
-		IF l_cnt > 0 THEN
-			LET l_isAllocated = TRUE
-		END IF
-
-		LET x = x + 1
-		CALL getTaskStatus(l_lista_rec.p_status, l_running, l_started, l_overrun_b, l_isAllocated)
-				RETURNING l_st, l_arr[x].line_img
-
-		LET l_arr[x].line1 = l_lists_rec.job_sheet_title
-		LET l_arr[x].line2 =
-				SFMT("WorkShop Hours: %1 Actual Hours: %2", l_lista_rec.workshop_hours, l_lista_rec.actual_hours)
-{
-		LET l_arr[x].line_img = "grey"
-		IF l_lista_rec.actual_hours > 0 THEN
-			LET l_arr[x].line_img = "grey"
-		END IF
-		IF l_lista_rec.p_status > 63 THEN
-			LET l_arr[x].line_img = "blue"
-			IF l_t1 > 0 THEN -- we have a trim1 record for the task it must be progress?
-				LET l_arr[x].line_img = "amber"
-			END IF
-		END IF
-		IF l_lista_rec.p_status > 127 THEN
-			LET l_arr[x].line_img = "green"
-		END IF
-		IF l_lista_rec.workshop_hours > 0 AND l_lista_rec.actual_hours > 0 THEN
-			IF l_lista_rec.workshop_hours - l_lista_rec.actual_hours < 0 THEN
-				LET l_light = FALSE
-			END IF
-		END IF
-		IF l_light THEN
-			LET l_arr[x].line_img = l_arr[x].line_img.append("_light")
-		ELSE
-			LET l_arr[x].line_img = l_arr[x].line_img.append("_dark")
-		END IF
-}
-		DEBUG(3, SFMT("getTasksForJob JL: %1, %2 Titl: %3 img: %4 WH: %5 AH: %6 OV: %7 ST: %8", l_job_link, x, l_lists_rec.job_sheet_title, l_arr[x].line_img, l_lista_rec.workshop_hours, l_lista_rec.actual_hours, l_overrun_b, l_st))
-	END FOREACH
 &ifdef DUMPDATA
-	CALL dumpData("getTasksForJob_" || l_job_link || ".json", util.json.stringify(l_arr))
+	CALL dumpData("getTasksForJob_" || l_job_link || ".json", util.JSON.stringify(l_arr))
 &endif
 	RETURN l_arr
 END FUNCTION
@@ -1589,23 +1008,12 @@ FUNCTION getTaskStatus(
 	RETURN l_status, l_lamp
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
-FUNCTION isClockedOn(l_empCode LIKE trim1.employee_code, l_branch LIKE trim1.branch_code)
+FUNCTION isClockedOn(l_empCode LIKE trim1.employee_code)
 		RETURNS(BOOLEAN, LIKE trim1.swipe_time)
 	DEFINE l_count SMALLINT
 	DEFINE l_dt    LIKE trim1.swipe_time
-	DEBUG(2, SFMT("isClockedOn: %1 %2 ...", l_empCode, l_branch))
-&ifdef NOUPD
-	RETURN TRUE, CURRENT
-&endif
-	SELECT COUNT(*) INTO l_count FROM trim1
-			WHERE trim1.employee_code = l_empCode AND trim1.branch_code = l_branch AND trim1.work_code = "__ON"
-					AND trim1.command_code = "X"
-	IF l_count = 1 THEN
-		SELECT swipe_time INTO l_dt FROM trim1
-				WHERE trim1.employee_code = l_empCode AND trim1.branch_code = l_branch AND trim1.work_code = "__ON"
-						AND trim1.command_code = "X"
-	END IF
-	DEBUG(2, SFMT("isClockedOn: %1 %2 %3", l_empCode, l_branch, l_count))
+	DEBUG(2, SFMT("isClockedOn: emp: %1", l_empCode))
+
 
 	RETURN (l_count > 0), l_dt
 END FUNCTION
@@ -1662,58 +1070,58 @@ FUNCTION runProg(l_prog STRING, l_args STRING) RETURNS SMALLINT
 	DEFINE l_cmd, l_genero STRING
 	DEFINE l_ret           SMALLINT
 	DEFINE l_result        STRING
-	DEFINE c               base.channel
+	DEFINE c               base.Channel
 -- check release dir exists
-	LET l_dir = os.path.join(m_db_moblib.cfg.baseDir, m_db_moblib.sysName)
-	IF NOT os.path.exists(l_dir) THEN
+	LET l_dir = os.Path.join(m_db_mobLib.cfg.baseDir, m_db_mobLib.sysName)
+	IF NOT os.Path.exists(l_dir) THEN
 		CALL stdLib.error(SFMT("Folder not found '%1'", l_dir), TRUE)
 		RETURN -1
 	END IF
 
 -- check generorun.sh exists
-	IF NOT os.path.exists("generorun.sh") THEN
+	IF NOT os.Path.exists("generorun.sh") THEN
 		CALL stdLib.error("generorun.sh not found!", TRUE)
 		RETURN -1
 	END IF
 
 -- check program exists
-	IF NOT os.path.exists(os.path.join(l_dir, l_prog || ".42r")) THEN
+	IF NOT os.Path.exists(os.Path.join(l_dir, l_prog || ".42r")) THEN
 		CALL stdLib.error(SFMT("Program '%1' not found", l_prog), TRUE)
 		RETURN -1
 	END IF
 
 -- Genero
-	LET l_genero = SFMT("/opt/fourjs/fgl%1", m_db_moblib.eclipseGenVer)
-	IF NOT os.path.exists(l_genero) THEN
+	LET l_genero = SFMT("/opt/fourjs/fgl%1", m_db_mobLib.eclipseGenVer)
+	IF NOT os.Path.exists(l_genero) THEN
 		CALL stdLib.error(SFMT("Failed to find '%1'", l_genero), TRUE)
 		RETURN -1
 	END IF
 
 	DEBUG(3, SFMT("runProg: Now in %1", l_dir))
 -- set env and run program
-	LET l_progDir = os.path.join(m_db_moblib.cfg.baseDir, m_db_moblib.sysName)
+	LET l_progDir = os.Path.join(m_db_mobLib.cfg.baseDir, m_db_mobLib.sysName)
 
-	CALL fgl_setEnv("DBNAME", m_db_moblib.dbName)
-	CALL fgl_setEnv("LOGNAME", m_db_moblib.user_id)
-	CALL fgl_setEnv("CONO", m_db_moblib.reg.cono)
-	CALL fgl_setEnv("BASEDIR", m_db_moblib.cfg.baseDir)
-	CALL fgl_setEnv("SYSNAME", m_db_moblib.sysName)
-	CALL fgl_setEnv("PROGDIR", l_progDir)
-	CALL fgl_setEnv("DATADIR", m_db_moblib.cfg.fileStorage)
-	CALL fgl_setEnv("TRIMDOCS", m_db_moblib.cfg.docPath)
-	CALL fgl_setEnv("FGLPROFILE", NULL)
+	CALL fgl_setenv("DBNAME", m_db_mobLib.dbName)
+	CALL fgl_setenv("LOGNAME", m_db_mobLib.user_id)
+	CALL fgl_setenv("CONO", m_db_mobLib.reg.cono)
+	CALL fgl_setenv("BASEDIR", m_db_mobLib.cfg.baseDir)
+	CALL fgl_setenv("SYSNAME", m_db_mobLib.sysName)
+	CALL fgl_setenv("PROGDIR", l_progDir)
+	CALL fgl_setenv("DATADIR", m_db_mobLib.cfg.fileStorage)
+	CALL fgl_setenv("TRIMDOCS", m_db_mobLib.cfg.docPath)
+	CALL fgl_setenv("FGLPROFILE", NULL)
 
 	LET l_cmd =
 			SFMT("./generorun.sh %1 %2 %3.run %4.42r %5",
-					m_db_moblib.eclipseGenVer, l_dir, stdLib.m_debugFile, l_prog, l_args)
-	DEBUG(3, SFMT("runProg: in %1", os.path.pwd()))
+					m_db_mobLib.eclipseGenVer, l_dir, stdLib.m_debugFile, l_prog, l_args)
+	DEBUG(3, SFMT("runProg: in %1", os.Path.pwd()))
 	DEBUG(3, SFMT("runProg: run: %1", l_cmd))
 	LET c = base.Channel.create()
-	CALL C.openPipe(l_cmd, "r")
+	CALL c.openPipe(l_cmd, "r")
 	WHILE NOT c.isEof()
 		LET l_result = l_result.append(c.readLine())
 	END WHILE
-	CALL C.close()
+	CALL c.close()
 	IF l_result != "Okay" THEN
 		CALL stdLib.error(SFMT("Run: %1\nFailed: %2 %3", l_cmd, l_ret, l_result), TRUE)
 	END IF
@@ -1726,8 +1134,8 @@ END FUNCTION
 FUNCTION getMOD() RETURNS STRING
 	DEFINE l_file STRING
 	DEFINE l_txt  TEXT
-	LET l_file = os.path.join(m_db_mobLib.cfg.cfgPath, "mod.txt")
-	IF NOT os.path.exists(l_file) THEN
+	LET l_file = os.Path.join(m_db_mobLib.cfg.cfgPath, "mod.txt")
+	IF NOT os.Path.exists(l_file) THEN
 		DEBUG(1, SFMT("No Message of the Day file: %1", l_file))
 		RETURN NULL
 	END IF
@@ -1739,7 +1147,7 @@ END FUNCTION
 FUNCTION getData(l_file STRING) RETURNS(STRING)
 	DEFINE l_dump TEXT
 	--DEBUG: dump task list to a JSON file for debug only.
-	IF os.path.exists(l_file) THEN
+	IF os.Path.exists(l_file) THEN
 		LOCATE l_dump IN FILE l_file
 		DISPLAY "Using: ", l_file
 	ELSE
@@ -1751,7 +1159,7 @@ END FUNCTION
 FUNCTION dumpData(l_file STRING, l_data STRING)
 	DEFINE l_dump TEXT
 	--DEBUG: dump task list to a JSON file for debug only.
-	IF NOT os.path.exists(l_file) THEN
+	IF NOT os.Path.exists(l_file) THEN
 		LOCATE l_dump IN FILE l_file
 		LET l_dump = l_data
 	END IF

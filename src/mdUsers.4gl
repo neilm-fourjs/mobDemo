@@ -5,7 +5,7 @@ IMPORT FGL mobLib
 IMPORT FGL stdLib
 IMPORT FGL dbLib
 
-SCHEMA bsdb
+&include "schema.inc"
 
 &define DEBUG( l_lev, l_msg ) IF this.mobLib.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
 
@@ -69,6 +69,8 @@ FUNCTION (this mdUsers) login(l_titl STRING, l_info STRING) RETURNS BOOLEAN
 			END IF
 			IF l_pwd IS NOT NULL THEN
 				IF NOT this.findEmployee(l_usr) THEN
+                    CALL stdLib.playSound("error.mp3")
+                    CALL stdLib.error("1) Invalid Login Details", TRUE)
 					LET l_attempts = l_attempts + 1
 					DEBUG(3, SFMT("Login attempt: %1", l_attempts))
 					IF l_attempts = 3 THEN
@@ -112,7 +114,8 @@ FUNCTION (this mdUsers) login(l_titl STRING, l_info STRING) RETURNS BOOLEAN
 				NEXT FIELD brn
 			END IF
 			IF NOT this.checkEmployee("L", l_usr, l_pwd) THEN
-				CALL stdLib.error("Invalid Login Details", TRUE)
+                CALL stdLib.playSound("error.mp3")
+				CALL stdLib.error("2) Invalid Login Details", TRUE)
 				NEXT FIELD usr
 			END IF
 			LET dbLib.m_db_moblib = this.mobLib
@@ -125,8 +128,8 @@ FUNCTION (this mdUsers) login(l_titl STRING, l_info STRING) RETURNS BOOLEAN
 	IF int_flag THEN
 		CALL this.mobLib.exitProgram("Login cancelled", 0)
 	END IF
-
-	CALL dbLib.isClockedOn(this.emp_rec.short_code, this.branch) RETURNING this.state, this.clockedOn
+    CALL stdLib.playSound("success.mp3")
+	CALL dbLib.isClockedOn(this.emp_rec.short_code) RETURNING this.state, this.clockedOn
 	DEBUG(1, SFMT("User: %1 - %2 Branch: %3 State: %4", this.emp_rec.short_code, this.emp_rec.full_name, this.branch, this.state))
 
 	RETURN TRUE
@@ -135,9 +138,6 @@ END FUNCTION
 -- Check that the Employee is able to do something.
 -- @param l_what = 'L' login checks / 'C' Clock On checks / 'S' Start Task
 FUNCTION (this mdUsers) checkEmployee(l_what CHAR(1), l_usr LIKE emp01.short_code, l_pwd STRING) RETURNS BOOLEAN
-	DEFINE l_ok      BOOLEAN
-	DEFINE l_reason  STRING
-	DEFINE l_temp_dt DATETIME YEAR TO SECOND
 	DEFINE l_img     STRING
 
 -- Sanity checks
@@ -198,7 +198,6 @@ FUNCTION (this mdUsers) findEmployee(l_empCode STRING) RETURNS BOOLEAN
 	LET l_empCode   = l_empCode.toUpperCase()
 	CALL dbLib.checkEmployee(l_empCode) RETURNING l_ok, m_branches
 	IF NOT l_ok THEN
-		CALL stdLib.error("Invalid Login Details", TRUE)
 		RETURN FALSE
 	END IF -- Update UI with Branch
 	LET l_cb = ui.ComboBox.forName("formonly.brn")
@@ -216,7 +215,7 @@ FUNCTION (this mdUsers) clockEvent() RETURNS()
 	DEFINE l_state SMALLINT
 	LET l_state = this.state
 
-	CALL dbLib.isClockedOn(this.emp_rec.short_code, this.branch) RETURNING this.state, this.clockedOn
+	CALL dbLib.isClockedOn(this.emp_rec.short_code) RETURNING this.state, this.clockedOn
 	DEBUG(1, SFMT("clockEvent, timeout: %1 Internal State: %2 DB State: %3 ", this.mobLib.cfg.timeouts.confirm, l_state, this.state))
 	IF l_state != this.state THEN
 		-- the state changed, they clocked in/out somewhere else ?
@@ -236,7 +235,7 @@ FUNCTION (this mdUsers) clockEvent() RETURNS()
 			LET this.state = NOT this.state
 			RETURN
 		END IF
-		CALL dbLib.clockOn(this.emp_rec.*) RETURNING l_stat, this.active
+		CALL dbLib.clockOn(this.emp_rec.short_code) RETURNING l_stat, this.active
 		IF NOT l_stat THEN
 			CALL stdLib.error("Clock On Failed!", TRUE)
 			LET this.state = NOT this.state
@@ -247,14 +246,14 @@ FUNCTION (this mdUsers) clockEvent() RETURNS()
 		END IF
 		DEBUG(1, SFMT("clockEvent - On  Stat: %1 Active: %2", l_stat, this.active))
 	ELSE -- Clock Off
-		IF NOT dbLib.clockOff(this.emp_rec.*) THEN
+		IF NOT dbLib.clockOff(this.emp_rec.short_code) THEN
 			CALL stdLib.error("Clock Off Failed!", TRUE)
 			LET this.state = NOT this.state
 			RETURN
 		END IF
 		DEBUG(1, "clockEvent - Off Okay")
 	END IF
-	CALL dbLib.isClockedOn(this.emp_rec.short_code, this.branch) RETURNING this.state, this.clockedOn
+	CALL dbLib.isClockedOn(this.emp_rec.short_code) RETURNING this.state, this.clockedOn
 END FUNCTION
 --------------------------------------------------------------------------------------------------------------
 -- Return the info string for the user
@@ -268,9 +267,7 @@ END FUNCTION
 FUNCTION (this mdUsers) emp_enq()
 	DEFINE l_current, l_allocated SMALLINT
 
-	CALL dbLib.claimedTime(this.emp_rec.short_code) RETURNING this.claim_mtd, this.claim_wtd, this.claim_today
-
-	CALL dbLib.activeTasks(this.emp_rec.short_code, this.branch) RETURNING l_current, l_allocated
+	CALL dbLib.activeTasks(this.emp_rec.short_code) RETURNING l_current
 	OPEN WINDOW emp_enq WITH FORM this.mobLib.openForm("trimEmpEnq")
 	DISPLAY BY NAME this.emp_rec.full_name, this.clockedOn, this.claim_today, this.claim_wtd, this.claim_mtd
 	DISPLAY l_allocated TO allocated_tasks

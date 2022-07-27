@@ -1,14 +1,14 @@
 IMPORT util
 IMPORT os
-IMPORT security
+
 IMPORT FGL fgldialog
 IMPORT FGL stdLib
 
-SCHEMA bsdb
+&include "schema.inc"
 
 &define DEBUG( l_lev, l_msg ) IF this.cfg.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, __LINE__, l_msg ) END IF
 
-CONSTANT C_DEF_DB = "d1234"
+CONSTANT C_DEF_DB = "mobdemo"
 CONSTANT C_CFGVER = 4
 
 GLOBALS
@@ -168,7 +168,7 @@ FUNCTION (this mobLib) init(l_app STRING) RETURNS(mobLib)
 		CALL this.exitProgram(SFMT("setup failed: %1 ", stdLib.m_lastError), 1)
 	END IF
 	LET stdLib.m_logPath = this.cfg.logPath
-
+	DEBUG(1, SFMT("PWD: %1", os.path.pwd()))
 	IF this.cfg.debug > 0 THEN
 		DEBUG(1, SFMT("Debug enabled: %1", this.cfg.debug))
 		DEBUG(2, SFMT("Args: %1", NUM_ARGS()))
@@ -287,7 +287,7 @@ FUNCTION (this mobLib) about()
 	LET l_txt = l_txt.append(SFMT("\nSession: %1", fgl_getEnv("FGL_VMPROXY_SESSION_ID")))
 	LET l_txt = l_txt.append(SFMT("\nDevID: %1", this.reg.dev_id))
 	LET l_txt = l_txt.append(SFMT("\nDevID2: %1", this.reg.dev_id2))
-
+	LET l_txt = l_txt.append(SFMT("\n\nDBName: %1", this.dbName))
 	LET l_txt = l_txt.append(SFMT("\n\nCoNo: %1", this.reg.cono))
 	LET l_txt = l_txt.append(SFMT("\nUser Id: %1", this.user_id))
 	LET l_txt = l_txt.append(SFMT("\nEmployee: %1", this.emp_code))

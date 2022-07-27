@@ -5,7 +5,7 @@ IMPORT os
 IMPORT security
 IMPORT FGL stdLib
 
-SCHEMA bsdb
+&include "schema.inc"
 
 &define DEBUG( l_lev, l_msg ) IF this.debug THEN CALL stdLib.debugOut( l_lev, __FILE__, this.errLine, l_msg ) END IF
 

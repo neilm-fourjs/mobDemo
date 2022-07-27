@@ -60,8 +60,8 @@ MAIN
 
 	IF fgl_getEnv("SHOWINFO") = 1 THEN
 		LET l_info = dbLib.getMOD()
-				{SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",
-						'<i class="material-icons">clean_hands</i>', '<i class="material-icons">coronavirus</i>')}
+		{SFMT("<p style=\"font-size:14px;\">&nbsp;Don't forget to %1 due to %2&nbsp;</p>",
+				'<i class="material-icons">clean_hands</i>', '<i class="material-icons">coronavirus</i>')}
 	END IF
 	WHILE TRUE
 		LET m_mobLib.emp_code = NULL
@@ -114,10 +114,10 @@ FUNCTION mainMenu() RETURNS()
 				LET l_ret = m_menu.itemActive("search", C_SEARCH_FEATURE)
 			END IF
 --			LET l_ret = m_menu.itemText("clockevent", "Clock Off")
-				LET l_ret = m_menu.itemState("clockevent", 2)
+			LET l_ret = m_menu.itemState("clockevent", 2)
 		ELSE
 --			LET l_ret = m_menu.itemText("clockevent", "Clock On")
-				LET l_ret = m_menu.itemState("clockevent", 1)
+			LET l_ret = m_menu.itemState("clockevent", 1)
 		END IF
 		IF m_user.onMiscTask THEN
 			LET l_ret = m_menu.itemState("misctask", 2)
